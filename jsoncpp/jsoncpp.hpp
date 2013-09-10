@@ -1,3 +1,6 @@
+#ifndef PWNED_JSONCPP_HPP
+#define PWNED_JSONCPP_HPP
+
 #include <string>
 #include <stdexcept>
 #include <json/json.h>
@@ -17,3 +20,6 @@ struct Json
 };
 
 } }
+
+#endif
+

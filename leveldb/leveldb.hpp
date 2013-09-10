@@ -1,3 +1,6 @@
+#ifndef PWNED_LEVELDB_HPP
+#define PWNED_LEVELDB_HPP
+
 #include <string>
 #include <stdexcept>
 #include <leveldb/db.h>
@@ -22,4 +25,6 @@ struct DB
 };
 
 } }
+
+#endif
 

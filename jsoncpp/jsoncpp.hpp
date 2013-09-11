@@ -18,12 +18,12 @@ struct Json
     operator= (json);
   }
 
-  std::string Json::to_string()
+  std::string string()
   {
     return writer.write(root);	
   }
 
-  void Json::operator= (std::string const &json)
+  void operator= (std::string const &json)
   {
     bool ok= reader.parse(json, root);
     if(!ok)

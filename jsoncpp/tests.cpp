@@ -4,7 +4,7 @@
 TEST(PwnedJson, ToString) {
   std::string str("{\"a\":{\"x\":1},\"b\":\"b\",\"c\":3.1415920}\n");
   pwned::jsoncpp::Json json(str);
-  EXPECT_EQ(json.to_string(), str);
+  EXPECT_EQ(json.string(), str);
 }
 
 int main(int argc, char **argv) 

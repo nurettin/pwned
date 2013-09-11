@@ -6,6 +6,7 @@
 #include <string>
 #include <boost/range/iterator_range.hpp>
 
+// TODO: recurse into container of containers
 namespace pwned { namespace io {
 
 template <typename T>
@@ -22,12 +23,6 @@ formatter<T> make_formatter(T const &value){ return formatter<T>(value); }
 template <typename T>
 std::ostream &operator<< (std::ostream &o, formatter<T> const &f){ return o<< f.value; }
 
-template <>
-std::ostream &operator<< <std::string>(std::ostream &o, formatter<std::string> const &f)
-{
-  return o<< '"'<< f.value<< '"';
-}
-
 template <typename T>
 std::ostream &operator<< (std::ostream &o, boost::iterator_range<T> const &r)
 {
@@ -36,6 +31,12 @@ std::ostream &operator<< (std::ostream &o, boost::iterator_range<T> const &r)
   -- e;
   for(;b!= e; ++ b) o<< make_formatter(*b)<< ", ";
   return o<< make_formatter(*e)<< ']';
+}
+
+template <>
+std::ostream &operator<< <std::string>(std::ostream &o, formatter<std::string> const &f)
+{
+  return o<< '"'<< f.value<< '"';
 }
 
 template <typename K, typename V>

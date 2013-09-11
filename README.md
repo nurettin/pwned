@@ -14,4 +14,4 @@ Simple leveldb interface
 pwned::io
 ---------
 
-Output standard C++ containers to streams
+Output standard C++ containers to streams (requires boost)

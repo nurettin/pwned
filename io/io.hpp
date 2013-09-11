@@ -6,8 +6,7 @@
 #include <string>
 #include <boost/range/iterator_range.hpp>
 
-namespace pwned
-{
+namespace pwned { namespace io {
 
 template <typename T>
 struct formatter
@@ -51,6 +50,7 @@ std::ostream &p(T const &c, std::ostream &o= std::cout)
   return o<< boost::make_iterator_range(c)<< '\n';
 }
 
+} // io
 } // pwned
 
 #endif

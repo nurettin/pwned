@@ -9,19 +9,41 @@ namespace pwned { namespace leveldb {
 
 struct DB
 {
-	std::string directory;
-	::leveldb::WriteOptions write_options;
-	::leveldb::ReadOptions read_options;
-	::leveldb::Options options;
-	::leveldb::DB* db;
+  std::string directory;
+  ::leveldb::WriteOptions write_options;
+  ::leveldb::ReadOptions read_options;
+  ::leveldb::Options options;
+  ::leveldb::DB* db;
 
-	DB(std::string const &);
-	void put(::leveldb::Slice const &, ::leveldb::Slice const &);
-	std::string get(::leveldb::Slice const &);
-	void remove(::leveldb::Slice const &);
-	void check_status(::leveldb::Status const &);
-	::leveldb::WriteOptions &WriteOptions();
-	::leveldb::Options &Options();
+  DB(std::string const &directory)
+  : directory(directory)
+  {
+    options.create_if_missing= true;
+    check_status(::leveldb::DB::Open(options, directory, &db));
+  }
+
+  void put(::leveldb::Slice const &k, ::leveldb::Slice const &v)
+  {
+    check_status(db-> Put(write_options, k, v));
+  }
+
+  std::string get(::leveldb::Slice const &k)
+  {
+    std::string v;
+    check_status(db-> Get(read_options, k, &v));
+    return v;
+  }
+
+  void remove(::leveldb::Slice const &k)
+  {
+    check_status(db-> Delete(write_options, k));
+  }
+
+  void check_status(::leveldb::Status const &status)
+  {
+    if(!status.ok())
+      throw std::runtime_error(status.ToString());
+  }
 };
 
 } }

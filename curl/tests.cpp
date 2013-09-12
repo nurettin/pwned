@@ -9,31 +9,35 @@ using boost::filesystem::current_path;
 #include "curl.hpp"
 using std::string;
 
-struct Env: ::testing::Environment {
-	void SetUp() { std::ofstream touch("touch.txt"); touch<< "touch"<< std::flush; }
-	void TearDown() { std::remove("touch.txt"); }
+struct Env: ::testing::Environment 
+{
+  void SetUp() { std::ofstream touch("touch.txt"); touch<< "touch"<< std::flush; }
+  void TearDown() { std::remove("touch.txt"); }
 };
 
-TEST(PwnedCurl, InvalidUrl) {
-	bool throws_on_invalid_url= false;
-	try
-	{
-  	string result= pwned::curl::open("wtf");
-	}
-	catch(std::runtime_error &)
-	{
-		throws_on_invalid_url= true;
-	}
-	EXPECT_EQ(throws_on_invalid_url, true);
+TEST(PwnedCurl, InvalidUrl) 
+{
+  bool throws_on_invalid_url= false;
+  try
+  {
+    string result= pwned::curl::open("wtf");
+  }
+  catch(std::runtime_error &)
+  {
+    throws_on_invalid_url= true;
+  }
+  EXPECT_EQ(throws_on_invalid_url, true);
 }
 
-TEST(PwnedCurl, LocalFile) {
+TEST(PwnedCurl, LocalFile) 
+{
   EXPECT_EQ(pwned::curl::open("file://"+ (current_path()/ "touch.txt").string()), "touch");
 }
 
-TEST(PwnedCurl, ValidUrl) {
-	EXPECT_EQ(boost::algorithm::starts_with(
-		pwned::curl::open("http://duckduckgo.com/robots.txt"), "User-agent: *"), true);
+TEST(PwnedCurl, ValidUrl) 
+{
+  EXPECT_EQ(boost::algorithm::starts_with(
+  pwned::curl::open("http://duckduckgo.com/robots.txt"), "User-agent: *"), true);
 }
 
 int main(int argc, char **argv) 

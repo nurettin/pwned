@@ -4,6 +4,7 @@ pwned
 Incomplete code, do not use in production!
 
 This library provides simple C++ interfaces to common programming tasks.
+There is more test code than library code !
 
 pwned::jsoncpp
 --------------

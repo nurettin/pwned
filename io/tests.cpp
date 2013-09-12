@@ -10,13 +10,12 @@ TEST(PwnedIo, Array)
 	double a[]= { 0.5, 0.3, 0.2 };
 	std::ostringstream out;
 	pwned::io::p(a, out);
-	EXPECT_EQ(out.str(), "[0.5, 0.3, 0.2]\n");
+	EXPECT_EQ(out.str(), "[0.5, 0.3, 0.2]");
 }
 
 TEST(PwnedIo, Vector)
 {
-	double a[]= { 0.5, 0.3, 0.2 };
-	std::vector<double> v(a, a+ 3);
+	std::vector<double> v{0.5, 0.3, 0.2};
 	std::ostringstream out;
 	pwned::io::p(v, out);
 	EXPECT_EQ(out.str(), "[0.5, 0.3, 0.2]\n");
@@ -29,7 +28,7 @@ TEST(PwnedIo, Map)
 	m["b"]= 44;
 	std::ostringstream out;
 	pwned::io::p(m, out);
-	EXPECT_EQ(out.str(), "[(\"a\", 42), (\"b\", 44)]\n");
+	EXPECT_EQ(out.str(), "[{\"a\": 42}, {\"b\": 44}]\n");
 }
 /*
 TEST(PwnedIo, MapOfMap)

@@ -4,55 +4,42 @@
 #include <iostream>
 #include <ostream>
 #include <string>
-#include <boost/range/iterator_range.hpp>
 
-// TODO: recurse into container of containers
 namespace pwned { namespace io {
 
 template <typename T>
-struct formatter
-{
-  T const &value;
-  formatter(T const &value): value(value){}
-  formatter(formatter<T> const &f): value(f.value){}
-};
+void puts(std::ostream &o, T const &t) { o<< t; }
 
-template <typename T>
-formatter<T> make_formatter(T const &value){ return formatter<T>(value); }
-
-template <typename T>
-std::ostream &operator<< (std::ostream &o, formatter<T> const &f){ return o<< f.value; }
-
-template <typename T>
-std::ostream &operator<< (std::ostream &o, boost::iterator_range<T> const &r)
-{
-  o<< '[';
-  typename boost::iterator_range<T>::const_iterator b= r.begin(), e= r.end(); 
-  -- e;
-  for(;b!= e; ++ b) o<< make_formatter(*b)<< ", ";
-  return o<< make_formatter(*e)<< ']';
-}
-
-template <>
-std::ostream &operator<< <std::string>(std::ostream &o, formatter<std::string> const &f)
-{
-  return o<< '"'<< f.value<< '"';
-}
+void puts(std::ostream &o, std::string const &s){ o<< '"'<< s<< '"'; }
 
 template <typename K, typename V>
-std::ostream &operator<< (std::ostream &o, std::pair<K, V> const &p)
+void puts(std::ostream &o, std::pair<K, V> const &p)
 {
-  return o<< '('<< make_formatter(p.first)<< ", "<< make_formatter(p.second)<< ')';
+  o<< '{'; puts(o, p.first);
+  o<< ": "; puts(o, p.second);
+  o<< '}';
+}
+
+template <typename C, typename I= typename C::const_iterator>
+typename std::enable_if<!std::is_same<C, std::string>::value, std::ostream &>::type
+operator<< (std::ostream &o, C const &c)
+{
+  o<< '[';
+  if(c.empty()) return o<< ']';
+  I b= c.begin(), e= c.end(); -- e;
+  for(; b!= e; ++ b)
+  {
+    puts(o, *b);
+    o<< ", ";
+  }
+  puts(o, *b);
+  return o<< ']';
 }
 
 template <typename T>
-std::ostream &p(T const &c, std::ostream &o= std::cout)
-{
-  return o<< boost::make_iterator_range(c)<< '\n';
-}
+void p(T const &t, std::ostream &o= std::cout) { o<< t<< '\n'<< std::flush; }
 
-} // io
-} // pwned
+} } // try using pwned::io::operator<<;
 
 #endif
 

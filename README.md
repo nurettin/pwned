@@ -1,28 +1,30 @@
-pwned
-=====
+*pwned*
 
 Incomplete code, do not use in production!
 
 This library provides simple C++ interfaces to common programming tasks.
-There is more test code than library code !
 
-pwned::jsoncpp
---------------
+Dependencies: boost-filesystem boost-system boost curl jsoncpp leveldb pthread gtest
+
+***Features:***
+
+1. There is more test code than library code ! (run make in the root directory to execute all tests)
+2. Header-only, yay slow and simple build !
+3. Opensource ! clone, feature branch, add code, add test, pull request, I will merge all things awesome 100% guaranteed.
+
+**pwned::jsoncpp**
 
 Simple jsoncpp interface
 
-pwned::leveldb
---------------
+**pwned::leveldb**
 
 Simple leveldb interface
 
-pwned::io
----------
+**pwned::io**
 
 Output C++ containers to streams
 
-pwned::curl
------------
+**pwned::curl**
 
 Download URIs into C++ sequence containers
 

@@ -1,6 +1,10 @@
 pwned
 =====
 
+Incomplete code, do not use in production!
+
+This library provides simple C++ interfaces to common programming tasks.
+
 pwned::jsoncpp
 --------------
 
@@ -14,4 +18,4 @@ Simple leveldb interface
 pwned::io
 ---------
 
-Output standard C++ containers to streams (requires boost)
+Output standard C++ containers to streams

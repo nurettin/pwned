@@ -38,7 +38,8 @@ struct DB
   {
     check_status(db-> Delete(write_options, k));
   }
-
+  
+  // TODO: Add range iteration
   void check_status(::leveldb::Status const &status)
   {
     if(!status.ok())

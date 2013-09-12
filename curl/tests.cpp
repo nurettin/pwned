@@ -4,10 +4,8 @@
 #include <fstream>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/filesystem.hpp>
-using boost::filesystem::current_path;
 #include <gtest/gtest.h>
 #include "curl.hpp"
-using std::string;
 
 struct Env: ::testing::Environment 
 {
@@ -20,7 +18,7 @@ TEST(PwnedCurl, InvalidUrl)
   bool throws_on_invalid_url= false;
   try
   {
-    string result= pwned::curl::open("wtf");
+    std::string result= pwned::curl::open("wtf");
   }
   catch(std::runtime_error &)
   {
@@ -31,7 +29,7 @@ TEST(PwnedCurl, InvalidUrl)
 
 TEST(PwnedCurl, LocalFile) 
 {
-  EXPECT_EQ(pwned::curl::open("file://"+ (current_path()/ "touch.txt").string()), "touch");
+  EXPECT_EQ(pwned::curl::open("file://"+ (boost::filesystem::current_path()/ "touch.txt").string()), "touch");
 }
 
 TEST(PwnedCurl, ValidUrl) 

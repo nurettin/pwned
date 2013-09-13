@@ -35,7 +35,7 @@ TEST(PwnedLeveldb, ReverseEach)
   Env::db-> put("20130913114805", "def");
   Env::db-> put("20130913114900", "wtf");
   std::vector<std::string> data;
-  Env::db-> reverse_each("20130913115000", "20130913114804", [&](std::string const &, std::string const &v) {
+  Env::db-> reverse_each("20130913115000", "20130913114805", [&](std::string const &, std::string const &v) {
     data.push_back(v);
   });
   EXPECT_EQ(data, (std::vector<std::string> { "wtf", "def" }));
@@ -58,7 +58,7 @@ TEST(PwnedLeveldb, Each)
     data.push_back(v);
   });
   EXPECT_EQ(data, (std::vector<std::string> { "abc", "def" }));
-  Env::db-> each("20130913114859", "20130913115000", [&](std::string const &, std::string const &v) {
+  Env::db-> each("20130913114859", "20130913114900", [&](std::string const &, std::string const &v) {
     data.push_back(v);
   });
   EXPECT_EQ(data, (std::vector<std::string> { "abc", "def", "wtf" }));

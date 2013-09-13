@@ -7,6 +7,7 @@
 #include <memory>
 #include <leveldb/db.h>
 #include <leveldb/write_batch.h>
+#include <leveldb/comparator.h>
 
 namespace pwned { namespace leveldb {
 
@@ -44,23 +45,23 @@ struct DB
     check_status(db-> Delete(write_options, k));
   }
   
-  void each(std::string const &begin
-    , std::string const &end
+  void each(::leveldb::Slice const &begin
+    , ::leveldb::Slice const &end
     , std::function<void(std::string const &, std::string const &)> f)
   {
     std::unique_ptr< ::leveldb::Iterator> it(db-> NewIterator(read_options));
     for(it-> Seek(begin); it-> Valid(); it-> Next())
     {
-      std::string key(it-> key().ToString());
-      if(key> end)
+      ::leveldb::Slice const &key= it-> key();
+      if(options.comparator-> Compare(key, end)> 0)
         break;
-      f(key, it-> value().ToString());
+      f(key.ToString(), it-> value().ToString());
     }
     check_status(it-> status());
   }
 
-  void reverse_each(std::string const &rbegin
-    , std::string const &rend
+  void reverse_each(::leveldb::Slice const &rbegin
+    , ::leveldb::Slice const &rend
     , std::function<void(std::string const &, std::string const &)> f)
   {
     std::unique_ptr< ::leveldb::Iterator> it(db-> NewIterator(read_options));
@@ -71,10 +72,10 @@ struct DB
       it-> Prev();
     for(; it-> Valid(); it-> Prev())
     {
-      std::string key(it-> key().ToString());
-      if(key< rend)
+      ::leveldb::Slice const &key= it-> key();
+      if(options.comparator-> Compare(rend, key)> 0)
         break;
-      f(key, it-> value().ToString());
+      f(key.ToString(), it-> value().ToString());
     }
     check_status(it-> status());
   }

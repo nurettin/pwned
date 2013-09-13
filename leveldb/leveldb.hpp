@@ -59,6 +59,24 @@ struct DB
     check_status(it-> status());
   }
 
+  void reverse_each(std::string const &rbegin
+    , std::string const &rend
+    , std::function<void(std::string const &, std::string const &)> f)
+  {
+    std::unique_ptr< ::leveldb::Iterator> it(db-> NewIterator(read_options));
+    it-> Seek(rbegin); 
+    if(!it-> Valid())
+      it-> SeekToLast(); 
+    for(;it-> Valid(); it-> Prev())
+    {
+      std::string key(it-> key().ToString());
+      if(key< rend)
+        break;
+      f(key, it-> value().ToString());
+    }
+    check_status(it-> status());
+  }
+
   void batch(std::function<void(::leveldb::WriteBatch &batch)> f)
   {
     ::leveldb::WriteBatch batch;

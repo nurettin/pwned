@@ -67,6 +67,8 @@ struct DB
     it-> Seek(rbegin); 
     if(!it-> Valid())
       it-> SeekToLast(); 
+    else
+      it-> Prev();
     for(;it-> Valid(); it-> Prev())
     {
       std::string key(it-> key().ToString());

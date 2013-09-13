@@ -31,11 +31,13 @@ TEST(PwnedCurl, LocalFile)
 {
   EXPECT_EQ(pwned::curl::open("file://"+ (boost::filesystem::current_path()/ "touch.txt").string()), "touch");
 }
-
+#include <iostream>
 TEST(PwnedCurl, ValidUrl) 
 {
+  std::string data= pwned::curl::open("http://duckduckgo.com/robots.txt");
+  std::cout<< data<< '\n';
   EXPECT_EQ(boost::algorithm::starts_with(
-  pwned::curl::open("http://duckduckgo.com/robots.txt"), "User-agent: *"), true);
+  data, "User-agent: *"), true);
 }
 
 int main(int argc, char **argv) 

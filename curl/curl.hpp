@@ -36,6 +36,7 @@ void open(std::string const &url, containerT &c)
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
   pwned::curl::set_output_container(curl, c);
   std::vector<char> error_buffer(CURL_ERROR_SIZE);
+  curl_easy_setopt(curl, CURLOPT_HEADER, 1);
   curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, &error_buffer[0]);
   int ok= curl_easy_perform(curl);
   curl_easy_cleanup(curl);

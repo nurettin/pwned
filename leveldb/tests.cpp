@@ -48,6 +48,23 @@ TEST(PwnedLeveldb, Each)
   Env::db-> remove("20130913114900");
 }
 
+TEST(PwnedLeveldb, Batch)
+{
+  Env::db-> batch([](::leveldb::WriteBatch &batch) {
+    batch.Put("20130913114800", "abc");
+    batch.Put("20130913114805", "def");
+    batch.Put("20130913114900", "wtf");
+  });
+  int count= 0;
+  Env::db-> each("20130913114800", "20130913115000", [&](std::string const &, std::string const &) {
+    ++ count;
+  });
+  EXPECT_EQ(count, 3);
+  Env::db-> remove("20130913114800");
+  Env::db-> remove("20130913114805");
+  Env::db-> remove("20130913114900");
+}
+
 int main(int argc, char **argv) 
 {
   ::testing::InitGoogleTest(&argc, argv);

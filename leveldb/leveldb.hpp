@@ -6,6 +6,7 @@
 #include <functional>
 #include <memory>
 #include <leveldb/db.h>
+#include <leveldb/write_batch.h>
 
 namespace pwned { namespace leveldb {
 
@@ -56,6 +57,13 @@ struct DB
       f(key, it-> value().ToString());
     }
     check_status(it-> status());
+  }
+
+  void batch(std::function<void(::leveldb::WriteBatch &batch)> f)
+  {
+    ::leveldb::WriteBatch batch;
+    f(batch);
+    check_status(db-> Write(write_options, &batch));
   }
 
   void check_status(::leveldb::Status const &status)

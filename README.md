@@ -8,7 +8,7 @@ Dependencies: boost-filesystem boost-system boost curl jsoncpp leveldb pthread g
 
 ### Features:
 
-1. There is more test code than library code ! (run make in the root directory to execute all tests)
+1. Every function has tests, google tests ! 
 2. Header-only, yay slow and simple build !
 3. Headers are cross-platform ! Windows away !
 4. Opensource ! clone, feature branch, add code, add test, pull request, I will merge all things awesome 100% guaranteed.

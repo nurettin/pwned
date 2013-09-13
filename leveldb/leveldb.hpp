@@ -69,7 +69,7 @@ struct DB
       it-> SeekToLast(); 
     else
       it-> Prev();
-    for(;it-> Valid(); it-> Prev())
+    for(; it-> Valid(); it-> Prev())
     {
       std::string key(it-> key().ToString());
       if(key< rend)

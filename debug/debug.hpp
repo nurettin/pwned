@@ -40,11 +40,7 @@ void print_loop(std::ostream &o, I b, I e)
 }
 
 template <typename T, std::size_t N>
-typename std::enable_if<
-  std::is_array<T[]>::value && 
-  !std::is_same<T, char> && 
-  !std::is_same<T, wchar_t
->::value, std::ostream &>::type
+typename std::enable_if<std::is_array<T[]>::value && !std::is_same<T, char>::value && !std::is_same<T, wchar_t>::value, std::ostream &>::type
 operator<< (std::ostream &o, T const (&a)[N])
 {
   print_loop(o, &a[0], &a[N]);

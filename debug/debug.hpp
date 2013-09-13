@@ -8,15 +8,15 @@
 namespace pwned { namespace debug {
 
 template <typename T>
-void puts(std::ostream &o, T const &t) { o<< t; }
+void print(std::ostream &o, T const &t) { o<< t; }
 
-void puts(std::ostream &o, std::string const &s){ o<< '"'<< s<< '"'; }
+void print(std::ostream &o, std::string const &s){ o<< '"'<< s<< '"'; }
 
 template <typename K, typename V>
-void puts(std::ostream &o, std::pair<K, V> const &p)
+void print(std::ostream &o, std::pair<K, V> const &p)
 {
-  o<< '{'; puts(o, p.first);
-  o<< ": "; puts(o, p.second);
+  o<< '{'; print(o, p.first);
+  o<< ": "; print(o, p.second);
   o<< '}';
 }
 
@@ -32,15 +32,19 @@ void print_loop(std::ostream &o, I b, I e)
   -- e;
   for(; b!= e; ++ b)
   {
-    puts(o, *b);
+    print(o, *b);
     o<< ", ";
   }
-  puts(o, *b);
+  print(o, *b);
   o<< ']';
 }
 
 template <typename T, std::size_t N>
-typename std::enable_if<std::is_array<T[]>::value && !std::is_same<T, char>::value, std::ostream &>::type
+typename std::enable_if<
+  std::is_array<T[]>::value && 
+  !std::is_same<T, char> && 
+  !std::is_same<T, wchar_t
+>::value, std::ostream &>::type
 operator<< (std::ostream &o, T const (&a)[N])
 {
   print_loop(o, &a[0], &a[N]);

@@ -24,6 +24,8 @@ struct DB
     check_status(::leveldb::DB::Open(options, directory, &db));
   }
 
+  ~DB(){ delete db; }
+
   void put(::leveldb::Slice const &k, ::leveldb::Slice const &v)
   {
     check_status(db-> Put(write_options, k, v));
@@ -61,6 +63,7 @@ struct DB
     if(!status.ok())
       throw std::runtime_error(status.ToString());
   }
+
 };
 
 } }

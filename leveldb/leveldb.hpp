@@ -3,6 +3,8 @@
 
 #include <string>
 #include <stdexcept>
+#include <functional>
+#include <memory>
 #include <leveldb/db.h>
 
 namespace pwned { namespace leveldb {
@@ -39,7 +41,21 @@ struct DB
     check_status(db-> Delete(write_options, k));
   }
   
-  // TODO: Add range iteration
+  void each(std::string const &begin
+    , std::string const &end
+    , std::function<void(std::string const &, std::string const &)> f)
+  {
+    std::unique_ptr< ::leveldb::Iterator> it(db-> NewIterator(read_options));
+    for(it-> Seek(begin); it-> Valid(); it-> Next())
+    {
+      std::string key(it-> key().ToString());
+      if(key> end)
+        break;
+      f(key, it-> value().ToString());
+    }
+    check_status(it-> status());
+  }
+
   void check_status(::leveldb::Status const &status)
   {
     if(!status.ok())

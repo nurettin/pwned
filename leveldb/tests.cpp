@@ -14,19 +14,34 @@ struct Env: ::testing::Environment
 
 pwned::leveldb::DB* Env::db(0);
 
-TEST(PwnedLeveldb, Remove) 
+TEST(PwnedLeveldb, Remove)
 {
   Env::db-> remove("1");
 }
 
-TEST(PwnedLeveldb, Put) 
+TEST(PwnedLeveldb, Put)
 {
   Env::db-> put("1", "hello world");
 }
 
-TEST(PwnedLeveldb, Get) 
+TEST(PwnedLeveldb, Get)
 {
   EXPECT_EQ(Env::db-> get("1"), "hello world");
+}
+
+TEST(PwnedLeveldb, Each)
+{
+  Env::db-> put("20130913114800", "abc");
+  Env::db-> put("20130913114805", "def");
+  Env::db-> put("20130913114900", "wtf");
+  std::vector<std::string> data;
+  Env::db-> each("20130913114800", "20130913114859", [&](std::string const &, std::string const &v) {
+    data.push_back(v);
+  });
+  Env::db-> remove("20130913114800");
+  Env::db-> remove("20130913114805");
+  Env::db-> remove("20130913114900");
+  EXPECT_EQ(data, (std::vector<std::string> { "abc", "def" }));
 }
 
 int main(int argc, char **argv) 

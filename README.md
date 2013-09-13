@@ -10,7 +10,8 @@ Dependencies: boost-filesystem boost-system boost curl jsoncpp leveldb pthread g
 
 1. There is more test code than library code ! (run make in the root directory to execute all tests)
 2. Header-only, yay slow and simple build !
-3. Opensource ! clone, feature branch, add code, add test, pull request, I will merge all things awesome 100% guaranteed.
+3. Headers are cross-platform ! Windows away !
+4. Opensource ! clone, feature branch, add code, add test, pull request, I will merge all things awesome 100% guaranteed.
 
 ## pwned::jsoncpp
 

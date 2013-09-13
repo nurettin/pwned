@@ -38,10 +38,13 @@ TEST(PwnedLeveldb, Each)
   Env::db-> each("20130913114800", "20130913114859", [&](std::string const &, std::string const &v) {
     data.push_back(v);
   });
+  Env::db-> each("20130913114859", "20130913115000", [&](std::string const &, std::string const &v) {
+    data.push_back(v);
+  });
   Env::db-> remove("20130913114800");
   Env::db-> remove("20130913114805");
   Env::db-> remove("20130913114900");
-  EXPECT_EQ(data, (std::vector<std::string> { "abc", "def" }));
+  EXPECT_EQ(data, (std::vector<std::string> { "abc", "def", "wtf" }));
 }
 
 int main(int argc, char **argv) 

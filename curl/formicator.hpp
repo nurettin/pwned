@@ -10,6 +10,9 @@
 // http://www.hackthissite.org/articles/read/1078
 // http://hcxselect.sourceforge.net/
 // https://github.com/jgehring/hcxselect
+
+namespace pwned{ namespace curl {
+
 struct Formicator
 {
   typedef std::map<std::string, std::string> Params;
@@ -65,6 +68,8 @@ struct Formicator
     clean_session();
   }
 };
+
+} } // pwned curl
 
 #endif
 

@@ -6,11 +6,6 @@
 #include <iostream>
 #include "curl.hpp"
 
-// http://www.mostthingsweb.com/2013/02/parsing-html-with-c/
-// http://www.hackthissite.org/articles/read/1078
-// http://hcxselect.sourceforge.net/
-// https://github.com/jgehring/hcxselect
-
 namespace pwned{ namespace curl {
 
 struct Formicator

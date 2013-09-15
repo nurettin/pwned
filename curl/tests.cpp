@@ -34,9 +34,10 @@ TEST(PwnedCurl, LocalFile)
 }
 
 #include <iostream>
+
 TEST(PwnedCurl, ValidUrl) 
 {
-  std::string data= pwned::curl::open("http://duckduckgo.com/robots.txt");
+  std::string data= pwned::curl::open("http://httpbin.com/robots.txt");
   EXPECT_EQ(boost::algorithm::starts_with(data, "User-agent: *"), true);
 }
 

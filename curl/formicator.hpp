@@ -70,6 +70,9 @@ struct Formicator
     if(ok!= 0)
       throw std::runtime_error(&error_buffer[0]);
   }
+
+  // http://httpbin.org/
+  // http://www.useragentstring.com/pages/Browserlist/
 };
 
 } } // pwned curl

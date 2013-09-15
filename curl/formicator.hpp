@@ -11,14 +11,14 @@ namespace pwned{ namespace curl {
 
 struct Formicator
 {
-  typedef std::map<std::string, std::string> Params;
-  
   CURL* curl;
+  std::string domain;
   std::string user_agent;
   std::string page;
 
-  Formicator(std::string const &user_agent= "Mozilla/4.0")
+  Formicator(std::string const &domain, std::string const &user_agent= "Mozilla/4.0")
   : curl(curl_easy_init())
+  , domain(domain)
   , user_agent(user_agent)
   {
     check(curl_easy_setopt(curl, CURLOPT_USERAGENT, user_agent.c_str()));
@@ -38,40 +38,20 @@ struct Formicator
     curl_easy_cleanup(curl);
   }
 
-  static std::string params_to_string(Params const &params)
-  {
-    std::string data;
-    Params::const_iterator pb= params.begin(), pe= params.end();
-    -- pe;
-    for(; pb!= pe; ++ pb)
-      data+= pb-> first+ "="+ pb-> second+ "&";
-    data+= pb-> first+ "="+ pb-> second;
-    return data;
-  }
-
-  void open(std::string const &uri)
+  void get(std::string const &url)
   {
     page= "";
-    pwned::curl::open(uri, page, curl, true);
+    pwned::curl::get(domain+ "/"+ url, page, curl, true);
   }
 
   void post(std::string const &url, Params const &params)
   {
     page= "";
     std::string params_string= params_to_string(params);
-    std::vector<char> error_buffer(CURL_ERROR_SIZE);
-
-    check(curl_easy_setopt(curl, CURLOPT_POSTFIELDS, params_string.c_str()));
-    check(curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, &error_buffer[0]));
-    check(curl_easy_setopt(curl, CURLOPT_URL, url.c_str()));
-    set_output_container(curl, page);
-    
-    int ok= curl_easy_perform(curl);
-    if(ok!= 0)
-      throw std::runtime_error(&error_buffer[0]);
+    pwned::curl::post(domain+ "/"+ url, page, params_string.c_str(), curl, true);
   }
 
-  // http://httpbin.org/
+
   // http://www.useragentstring.com/pages/Browserlist/
 };
 

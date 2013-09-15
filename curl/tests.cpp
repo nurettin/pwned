@@ -6,6 +6,7 @@
 #include <boost/filesystem.hpp>
 #include <gtest/gtest.h>
 #include "curl.hpp"
+#include "formicator.hpp"
 
 struct Env: ::testing::Environment 
 {
@@ -31,12 +32,12 @@ TEST(PwnedCurl, LocalFile)
 {
   EXPECT_EQ(pwned::curl::open("file://"+ (boost::filesystem::current_path()/ "touch.txt").string()), "touch");
 }
+
 #include <iostream>
 TEST(PwnedCurl, ValidUrl) 
 {
   std::string data= pwned::curl::open("http://duckduckgo.com/robots.txt");
-  EXPECT_EQ(boost::algorithm::starts_with(
-  data, "User-agent: *"), true);
+  EXPECT_EQ(boost::algorithm::starts_with(data, "User-agent: *"), true);
 }
 
 int main(int argc, char **argv) 

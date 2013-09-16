@@ -70,6 +70,12 @@ TEST(PwnedCurlFormicator, Cookies)
   EXPECT_EQ(boost::algorithm::contains(Env::f-> page, "\"session\": \"sessionid123\""), true);
 }
 
+TEST(PwnedCurlFormicator, Find)
+{
+  Env::f-> get("/html");
+  EXPECT_EQ(Env::f-> find("h1").begin()-> text(), "Herman Melville - Moby-Dick");
+}
+
 int main(int argc, char **argv) 
 {
   ::testing::InitGoogleTest(&argc, argv);

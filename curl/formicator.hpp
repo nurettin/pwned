@@ -12,9 +12,12 @@ namespace pwned{ namespace curl {
 struct Formicator
 {
   CURL* curl;
+  htmlcxx::HTML::ParserDom parser;
   std::string domain;
   std::string user_agent;
   std::string page;
+  tree<htmlcxx::HTML::Node> dom;
+  hcxselect::Selector selector;
 
   Formicator(std::string const &domain, std::string const &user_agent= "Mozilla/4.0")
   : curl(curl_easy_init())
@@ -38,21 +41,52 @@ struct Formicator
     curl_easy_cleanup(curl);
   }
 
-  void get(std::string const &url)
+  void perform(std::function<void()> block)
   {
     page= "";
-    pwned::curl::get(domain+ "/"+ url, page, curl, true);
+    block();
+    dom= parser.parseTree(page);
+    selector= hcxselect::Selector(dom);
+  }
+
+  void get(std::string const &url)
+  {
+    perform([&](){
+      pwned::curl::get(domain+ "/"+ url, page, curl, true);
+    });
   }
 
   void post(std::string const &url, Params const &params)
   {
-    page= "";
     std::string params_string= params_to_string(params);
-    pwned::curl::post(domain+ "/"+ url, page, params_string.c_str(), curl, true);
+    perform([&](){
+      pwned::curl::post(domain+ "/"+ url, page, params_string.c_str(), curl, true);
+    });
   }
 
+  std::vector<tree<htmlcxx::HTML::Node>::iterator> select(std::string const &css)
+  {
+    hcxselect::Selection nodes= selector.select(css);
+    std::vector<tree<htmlcxx::HTML::Node>::iterator> iterators;
+    for(hcxselect::Selection::const_iterator b= nodes.begin(); b!= nodes.end(); ++ b)
+    {
+      tree<htmlcxx::HTML::Node>::iterator it;
+      for(auto di= dom.begin(); di!= dom.end(); ++ di)
+        if(*di== (*b)-> data)
+        {
+          it= di;
+          break;
+        }
+      iterators.emplace_back(it);
+    }
+    return iterators;
+  }
 
-  // http://www.useragentstring.com/pages/Browserlist/
+  tree<htmlcxx::HTML::Node>::iterator find(std::string const &css)
+  {
+    return select(css).front();
+  }
+
 };
 
 } } // pwned curl

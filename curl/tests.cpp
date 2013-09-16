@@ -61,6 +61,10 @@ TEST(PwnedCurlFormicator, Post)
 {
   Env::f-> post("/post", { { "abc", "123" } });
   EXPECT_EQ(boost::algorithm::contains(Env::f-> page, "\"abc\": \"123\""), true);
+}
+
+TEST(PwnedCurlFormicator, Cookies)
+{
   Env::f-> get("/cookies/set?session=sessionid123");
   Env::f-> get("/cookies");
   EXPECT_EQ(boost::algorithm::contains(Env::f-> page, "\"session\": \"sessionid123\""), true);

@@ -20,7 +20,7 @@ Download URIs into C++ sequence containers, fill forms and post!
 
 ## pwned::curl::Formicator
 
-Scrape the web with Formicator in your favorite language. With cookies!
+Scrape the web with Formicator in your favorite language. Formication and delicious cookies!
 
 ## pwned::jsoncpp
 

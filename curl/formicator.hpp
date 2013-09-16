@@ -71,7 +71,7 @@ struct Formicator
 
   tree_node_<htmlcxx::HTML::Node>* find(std::string const &css)
   {
-    hcxselect::Selection selection= select(css);
+    hcxselect::Selection selection= selector.select(css);
     if(selection.empty()) return 0;
     return *select(css).begin();
   }

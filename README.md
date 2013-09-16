@@ -9,18 +9,18 @@ Special thanks to [httpbin](https://github.com/kennethreitz/httpbin) for providi
 
 ### Features:
 
-1. Every function has tests, google tests ! For documentation, read the fabulous tests.
+1. Every function has tests, google tests! For documentation, read the fabulous tests.
 2. Header-only, yay slow and simple build !
-3. Headers are cross-platform ! Windows away !
-4. Opensource ! clone, feature branch, add code, add test, pull request, I will merge all things awesome 100% guaranteed.
+3. Headers are cross-platform. Windows away !
+4. Opensource. Clone, feature branch, add code, add test, pull request, I will merge all things awesome 100% guaranteed.
 
 ## pwned::curl
 
-Download URIs into C++ sequence containers
+Download URIs into C++ sequence containers, fill forms and post!
 
 ## pwned::curl::Formicator
 
-Scrape the web with Formicator in your favorite language
+Scrape the web with Formicator in your favorite language. With cookies!
 
 ## pwned::jsoncpp
 
@@ -28,7 +28,7 @@ Simple jsoncpp interface
 
 ## pwned::leveldb
 
-Simple leveldb interface
+Simple leveldb interface. Supports reverse iteration between two values!
 
 ## pwned::debug
 

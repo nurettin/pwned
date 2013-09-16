@@ -5,7 +5,7 @@ Incomplete code, do not use in production!
 This library provides simple C++(11) interfaces to common programming tasks.
 
 Dependencies: boost-filesystem boost-system boost curl jsoncpp leveldb pthread gtest htmlcxx hcxselect
-Special thanks to (httpbin)[https://github.com/kennethreitz/httpbin] for providing a way to test Formicator. 
+Special thanks to [httpbin](https://github.com/kennethreitz/httpbin) for providing a way to test Formicator. 
 
 ### Features:
 

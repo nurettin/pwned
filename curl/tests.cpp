@@ -73,7 +73,7 @@ TEST(PwnedCurlFormicator, Cookies)
 TEST(PwnedCurlFormicator, Find)
 {
   Env::f-> get("/html");
-  EXPECT_EQ(Env::f-> find("h1").begin()-> text(), "Herman Melville - Moby-Dick");
+  EXPECT_EQ(Env::f-> find("h1")-> first_child-> data.text(), "Herman Melville - Moby-Dick");
 }
 
 int main(int argc, char **argv) 

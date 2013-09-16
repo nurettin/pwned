@@ -64,27 +64,16 @@ struct Formicator
     });
   }
 
-  std::vector<tree<htmlcxx::HTML::Node>::iterator> select(std::string const &css)
+  hcxselect::Selection select(std::string const &css)
   {
-    hcxselect::Selection nodes= selector.select(css);
-    std::vector<tree<htmlcxx::HTML::Node>::iterator> iterators;
-    for(hcxselect::Selection::const_iterator b= nodes.begin(); b!= nodes.end(); ++ b)
-    {
-      tree<htmlcxx::HTML::Node>::iterator it;
-      for(auto di= dom.begin(); di!= dom.end(); ++ di)
-        if(*di== (*b)-> data)
-        {
-          it= di;
-          break;
-        }
-      iterators.emplace_back(it);
-    }
-    return iterators;
+    return selector.select(css);
   }
 
-  tree<htmlcxx::HTML::Node>::iterator find(std::string const &css)
+  tree_node_<htmlcxx::HTML::Node>* find(std::string const &css)
   {
-    return select(css).front();
+    hcxselect::Selection selection= select(css);
+    if(selection.empty()) return 0;
+    return *select(css).begin();
   }
 
 };

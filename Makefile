@@ -1,10 +1,10 @@
 all: run_tests
 
 run_tests:
-	@cd pretty && make && cd ..
-	@cd curl && make && cd ..
-	@cd leveldb && make && cd ..
-	@cd jsoncpp && make && cd ..
+	@cd pretty && $(MAKE) && cd ..
+	@cd curl && $(MAKE) && cd ..
+	@cd leveldb && $(MAKE) && cd ..
+	@cd jsoncpp && $(MAKE) && cd ..
 	@printf "test LOC:" && wc -l */tests.cpp | grep total
 	@printf "code LOC:" && wc -l */*.hpp | grep total
 

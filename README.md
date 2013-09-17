@@ -1,6 +1,6 @@
 # pwned
 
-Incomplete code, do not use in production!
+Incomplete code, do not use in production! [![Build Status](https://travis-ci.org/nurettin/pwned.png?branch=master)](https://travis-ci.org/nurettin/pwned)
 
 This library provides simple C++(11) interfaces to common programming tasks.
 

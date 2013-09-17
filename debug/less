@@ -1,0 +1,117 @@
+In file included from tests.cpp:6:
+./debug.hpp:37:3: error: call to function 'print_loop' that is neither visible in the template definition nor found by argument-dependent lookup
+  print_loop(o, c.begin(), c.end());
+  ^
+./debug.hpp:61:51: note: in instantiation of function template specialization 'pwned::debug::operator<<<std::vector<int, std::allocator<int> >, __gnu_cxx::__normal_iterator<const int *, std::vector<int, std::allocator<int> > > >' requested here
+void p(T const &t, std::ostream &o= std::cout) { o<< t<< '\n'<< std::flush; }
+                                                  ^
+tests.cpp:12:3: note: in instantiation of function template specialization 'pwned::debug::p<std::vector<int, std::allocator<int> > >' requested here
+  pwned::debug::p(v, out);
+  ^
+./debug.hpp:42:6: note: 'print_loop' should be declared prior to the call site or in namespace '__gnu_cxx'
+void print_loop(std::ostream &o, I b, I e)
+     ^
+./debug.hpp:29:3: error: call to function 'print_loop' that is neither visible in the template definition nor found by argument-dependent lookup
+  print_loop(o, &a[0], &a[N]);
+  ^
+./debug.hpp:61:51: note: in instantiation of function template specialization 'pwned::debug::operator<<<double, 3>' requested here
+void p(T const &t, std::ostream &o= std::cout) { o<< t<< '\n'<< std::flush; }
+                                                  ^
+tests.cpp:20:3: note: in instantiation of function template specialization 'pwned::debug::p<double [3]>' requested here
+  pwned::debug::p(a, out);
+  ^
+./debug.hpp:42:6: note: 'print_loop' should be declared prior to the call site
+void print_loop(std::ostream &o, I b, I e)
+     ^
+./debug.hpp:37:3: error: call to function 'print_loop' that is neither visible in the template definition nor found by argument-dependent lookup
+  print_loop(o, c.begin(), c.end());
+  ^
+./debug.hpp:61:51: note: in instantiation of function template specialization 'pwned::debug::operator<<<std::vector<double, std::allocator<double> >, __gnu_cxx::__normal_iterator<const double *, std::vector<double, std::allocator<double> > > >' requested here
+void p(T const &t, std::ostream &o= std::cout) { o<< t<< '\n'<< std::flush; }
+                                                  ^
+tests.cpp:28:3: note: in instantiation of function template specialization 'pwned::debug::p<std::vector<double, std::allocator<double> > >' requested here
+  pwned::debug::p(v, out);
+  ^
+./debug.hpp:42:6: note: 'print_loop' should be declared prior to the call site or in namespace '__gnu_cxx'
+void print_loop(std::ostream &o, I b, I e)
+     ^
+./debug.hpp:37:3: error: call to function 'print_loop' that is neither visible in the template definition nor found by argument-dependent lookup
+  print_loop(o, c.begin(), c.end());
+  ^
+./debug.hpp:61:51: note: in instantiation of function template specialization 'pwned::debug::operator<<<std::map<std::basic_string<char>, int, std::less<std::basic_string<char> >, std::allocator<std::pair<const std::basic_string<char>, int> > >, std::_Rb_tree_const_iterator<std::pair<const std::basic_string<char>, int> > >' requested here
+void p(T const &t, std::ostream &o= std::cout) { o<< t<< '\n'<< std::flush; }
+                                                  ^
+tests.cpp:38:3: note: in instantiation of function template specialization 'pwned::debug::p<std::map<std::basic_string<char>, int, std::less<std::basic_string<char> >, std::allocator<std::pair<const std::basic_string<char>, int> > > >' requested here
+  pwned::debug::p(m, out);
+  ^
+./debug.hpp:42:6: note: 'print_loop' should be declared prior to the call site or in namespace '__gnu_cxx'
+void print_loop(std::ostream &o, I b, I e)
+     ^
+./debug.hpp:37:3: error: call to function 'print_loop' that is neither visible in the template definition nor found by argument-dependent lookup
+  print_loop(o, c.begin(), c.end());
+  ^
+./debug.hpp:61:51: note: in instantiation of function template specialization 'pwned::debug::operator<<<std::map<std::basic_string<char>, std::map<std::basic_string<char>, int, std::less<std::basic_string<char> >, std::allocator<std::pair<const std::basic_string<char>, int> > >, std::less<std::basic_string<char> >, std::allocator<std::pair<const std::basic_string<char>, std::map<std::basic_string<char>, int, std::less<std::basic_string<char> >, std::allocator<std::pair<const std::basic_string<char>, int> > > > > >, std::_Rb_tree_const_iterator<std::pair<const std::basic_string<char>, std::map<std::basic_string<char>, int, std::less<std::basic_string<char> >, std::allocator<std::pair<const std::basic_string<char>, int> > > > > >' requested here
+void p(T const &t, std::ostream &o= std::cout) { o<< t<< '\n'<< std::flush; }
+                                                  ^
+tests.cpp:49:3: note: in instantiation of function template specialization 'pwned::debug::p<std::map<std::basic_string<char>, std::map<std::basic_string<char>, int, std::less<std::basic_string<char> >, std::allocator<std::pair<const std::basic_string<char>, int> > >, std::less<std::basic_string<char> >, std::allocator<std::pair<const std::basic_string<char>, std::map<std::basic_string<char>, int, std::less<std::basic_string<char> >, std::allocator<std::pair<const std::basic_string<char>, int> > > > > > >' requested here
+  pwned::debug::p(m, out);
+  ^
+./debug.hpp:42:6: note: 'print_loop' should be declared prior to the call site or in namespace '__gnu_cxx'
+void print_loop(std::ostream &o, I b, I e)
+     ^
+./debug.hpp:13:44: error: call to function 'operator<<' that is neither visible in the template definition nor found by argument-dependent lookup
+void print(std::ostream &o, T const &t) { o<< t; }
+                                           ^
+./debug.hpp:21:13: note: in instantiation of function template specialization 'pwned::debug::print<std::map<std::basic_string<char>, int, std::less<std::basic_string<char> >, std::allocator<std::pair<const std::basic_string<char>, int> > > >' requested here
+  o<< ": "; print(o, p.second);
+            ^
+./debug.hpp:53:5: note: in instantiation of function template specialization 'pwned::debug::print<const std::basic_string<char>, std::map<std::basic_string<char>, int, std::less<std::basic_string<char> >, std::allocator<std::pair<const std::basic_string<char>, int> > > >' requested here
+    print(o, *b);
+    ^
+./debug.hpp:37:3: note: in instantiation of function template specialization 'pwned::debug::print_loop<std::_Rb_tree_const_iterator<std::pair<const std::basic_string<char>, std::map<std::basic_string<char>, int, std::less<std::basic_string<char> >, std::allocator<std::pair<const std::basic_string<char>, int> > > > > >' requested here
+  print_loop(o, c.begin(), c.end());
+  ^
+./debug.hpp:61:51: note: in instantiation of function template specialization 'pwned::debug::operator<<<std::map<std::basic_string<char>, std::map<std::basic_string<char>, int, std::less<std::basic_string<char> >, std::allocator<std::pair<const std::basic_string<char>, int> > >, std::less<std::basic_string<char> >, std::allocator<std::pair<const std::basic_string<char>, std::map<std::basic_string<char>, int, std::less<std::basic_string<char> >, std::allocator<std::pair<const std::basic_string<char>, int> > > > > >, std::_Rb_tree_const_iterator<std::pair<const std::basic_string<char>, std::map<std::basic_string<char>, int, std::less<std::basic_string<char> >, std::allocator<std::pair<const std::basic_string<char>, int> > > > > >' requested here
+void p(T const &t, std::ostream &o= std::cout) { o<< t<< '\n'<< std::flush; }
+                                                  ^
+tests.cpp:49:3: note: in instantiation of function template specialization 'pwned::debug::p<std::map<std::basic_string<char>, std::map<std::basic_string<char>, int, std::less<std::basic_string<char> >, std::allocator<std::pair<const std::basic_string<char>, int> > >, std::less<std::basic_string<char> >, std::allocator<std::pair<const std::basic_string<char>, std::map<std::basic_string<char>, int, std::less<std::basic_string<char> >, std::allocator<std::pair<const std::basic_string<char>, int> > > > > > >' requested here
+  pwned::debug::p(m, out);
+  ^
+./debug.hpp:35:1: note: 'operator<<' should be declared prior to the call site or in namespace '__gnu_cxx'
+operator<< (std::ostream &o, C const &c)
+^
+./debug.hpp:37:3: error: call to function 'print_loop' that is neither visible in the template definition nor found by argument-dependent lookup
+  print_loop(o, c.begin(), c.end());
+  ^
+./debug.hpp:61:51: note: in instantiation of function template specialization 'pwned::debug::operator<<<std::map<std::basic_string<char>, std::vector<int, std::allocator<int> >, std::less<std::basic_string<char> >, std::allocator<std::pair<const std::basic_string<char>, std::vector<int, std::allocator<int> > > > >, std::_Rb_tree_const_iterator<std::pair<const std::basic_string<char>, std::vector<int, std::allocator<int> > > > >' requested here
+void p(T const &t, std::ostream &o= std::cout) { o<< t<< '\n'<< std::flush; }
+                                                  ^
+tests.cpp:59:3: note: in instantiation of function template specialization 'pwned::debug::p<std::map<std::basic_string<char>, std::vector<int, std::allocator<int> >, std::less<std::basic_string<char> >, std::allocator<std::pair<const std::basic_string<char>, std::vector<int, std::allocator<int> > > > > >' requested here
+  pwned::debug::p(mv, out);
+  ^
+./debug.hpp:42:6: note: 'print_loop' should be declared prior to the call site or in namespace '__gnu_cxx'
+void print_loop(std::ostream &o, I b, I e)
+     ^
+./debug.hpp:13:44: error: call to function 'operator<<' that is neither visible in the template definition nor found by argument-dependent lookup
+void print(std::ostream &o, T const &t) { o<< t; }
+                                           ^
+./debug.hpp:21:13: note: in instantiation of function template specialization 'pwned::debug::print<std::vector<int, std::allocator<int> > >' requested here
+  o<< ": "; print(o, p.second);
+            ^
+./debug.hpp:53:5: note: in instantiation of function template specialization 'pwned::debug::print<const std::basic_string<char>, std::vector<int, std::allocator<int> > >' requested here
+    print(o, *b);
+    ^
+./debug.hpp:37:3: note: in instantiation of function template specialization 'pwned::debug::print_loop<std::_Rb_tree_const_iterator<std::pair<const std::basic_string<char>, std::vector<int, std::allocator<int> > > > >' requested here
+  print_loop(o, c.begin(), c.end());
+  ^
+./debug.hpp:61:51: note: in instantiation of function template specialization 'pwned::debug::operator<<<std::map<std::basic_string<char>, std::vector<int, std::allocator<int> >, std::less<std::basic_string<char> >, std::allocator<std::pair<const std::basic_string<char>, std::vector<int, std::allocator<int> > > > >, std::_Rb_tree_const_iterator<std::pair<const std::basic_string<char>, std::vector<int, std::allocator<int> > > > >' requested here
+void p(T const &t, std::ostream &o= std::cout) { o<< t<< '\n'<< std::flush; }
+                                                  ^
+tests.cpp:59:3: note: in instantiation of function template specialization 'pwned::debug::p<std::map<std::basic_string<char>, std::vector<int, std::allocator<int> >, std::less<std::basic_string<char> >, std::allocator<std::pair<const std::basic_string<char>, std::vector<int, std::allocator<int> > > > > >' requested here
+  pwned::debug::p(mv, out);
+  ^
+./debug.hpp:35:1: note: 'operator<<' should be declared prior to the call site or in namespace '__gnu_cxx'
+operator<< (std::ostream &o, C const &c)
+^
+8 errors generated.
+make: *** [run_tests] Error 1

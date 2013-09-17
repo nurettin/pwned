@@ -39,11 +39,18 @@ void print_loop(std::ostream &o, I b, I e)
   o<< ']';
 }
 
+template <typename T>
+void p(T const &t, std::ostream &o= std::cout) { o<< t<< '\n'<< std::flush; }
+
+} } // pwned debug
+
+namespace std {
+
 template <typename T, std::size_t N>
 typename std::enable_if<std::is_array<T[]>::value && !std::is_same<T, char>::value && !std::is_same<T, wchar_t>::value, std::ostream &>::type
 operator<< (std::ostream &o, T const (&a)[N])
 {
-  print_loop(o, &a[0], &a[N]);
+  pwned::debug::print_loop(o, &a[0], &a[N]);
   return o;
 }
 
@@ -51,13 +58,10 @@ template <typename C, typename I= typename C::const_iterator>
 typename std::enable_if<!std::is_same<C, std::string>::value, std::ostream &>::type
 operator<< (std::ostream &o, C const &c)
 {
-  print_loop(o, c.begin(), c.end());
+  pwned::debug::print_loop(o, c.begin(), c.end());
   return o;
 }
 
-template <typename T>
-void p(T const &t, std::ostream &o= std::cout) { o<< t<< '\n'<< std::flush; }
-
-} } // try using pwned::debug::operator<<;
+} // std
 
 #endif

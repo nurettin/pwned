@@ -12,5 +12,6 @@ before_install:
   - sudo make -j4
   - sudo ln -s /usr/src/gtest/build/libgtest.so /usr/lib/libgtest.so
   - sudo ln -s /usr/src/gtest/build/libgtest_main.so /usr/lib/libgtest_main.so
+  - cd -
   - git submodule update --init --recursive
 script: make

@@ -1,5 +1,13 @@
+language: cpp
+compiler:
+  - clang
+  - gcc
 before_install:
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update -qq
+  - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
   - sudo apt-get install -qq libboost-filesystem-dev libboost-system-dev libboost-dev libgtest-dev libhtmlcxx-dev libcurl4-openssl-dev libjsoncpp-dev
   - git submodule update --init --recursive
-script: "make"
+before_install:
+script: make

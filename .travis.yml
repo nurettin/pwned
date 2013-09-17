@@ -6,5 +6,10 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq libboost-filesystem-dev libboost-system-dev libboost-dev libgtest-dev libhtmlcxx-dev libcurl4-openssl-dev libjsoncpp-dev g++-4.8
   - export CXX="g++-4.8" CC="gcc-4.8"
+  - cd /usr/src/gtest/build
+  - sudo cmake .. -D BUILD_SHARED_LIBS=1
+  - sudo make -j4
+  - sudo ln -s /usr/src/gtest/build/libgtest.so /usr/lib/libgtest.so
+  - sudo ln -s /usr/src/gtest/build/libgtest_main.so /usr/lib/libgtest_main.so
   - git submodule update --init --recursive
 script: make

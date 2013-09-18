@@ -1,6 +1,7 @@
 #include <iostream>
 #include <functional>
 #include <algorithm>
+#include "../pretty/pretty.hpp"
 
 template <typename T>
 struct CopyView 
@@ -147,7 +148,6 @@ struct RangeView
   CopyView<std::vector<T>> map(F f)
   {
     std::vector<T> c;
-    c.reserve(end- begin);
     for(T b= begin; b!= end; ++ b)
       c.emplace_back(f(*b));
     return CopyView<std::vector<T>>(c);
@@ -193,7 +193,6 @@ int main()
   v.emplace_back(1);
   v.emplace_back(2);
   v.emplace_back(3);
-  view(v.begin(), v.end()).each([](int &i){ i+= 1; }).
-    map([](int const &i){ return i* i; });
+  view(v.begin(), v.end()).each([](int &i){ i+= 1; });
 }
 

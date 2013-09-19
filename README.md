@@ -22,6 +22,10 @@ Download URIs into C++ sequence containers, fill forms and post!
 
 Scrape the web with Formicator in your favorite language. Formication and delicious cookies!
 
+## pwned::view
+
+Map, reduce, select from C++ containers and iterator ranges. Low copy overhead and simplified coding.
+
 ## pwned::jsoncpp
 
 Simple jsoncpp interface

@@ -1,198 +1,45 @@
-#include <iostream>
-#include <functional>
-#include <algorithm>
-#include "../pretty/pretty.hpp"
+#include <gtest/gtest.h>
+#include "view.hpp"
 
-template <typename T>
-struct CopyView 
+using pwned::view::view;
+
+TEST(PwnedView, View)
 {
-  typedef typename T::value_type VT;
-  T t;
-
-  CopyView(T const &t)
-  : t(t)
-  {}
-
-  CopyView(CopyView const &)= delete;
-  CopyView &operator= (CopyView const &)= delete;
-  
-  CopyView(CopyView &&v)
-  : t(v.t)
-  {}
-
-  template <typename F>
-  CopyView &each(F f)
-  {
-    for(auto &e: t) f(e);
-    return *this;
-  }
-
-  template <typename F>
-  CopyView const &each(F f) const
-  {
-    for(auto const &e: t) f(e);
-    return *this;
-  }
-
-  template <typename F>
-  CopyView map(F f)
-  {
-    T c;
-    c.reserve(t.size());
-    for(auto &e: t) c.emplace_back(f(e));
-    return CopyView(c);
-  }
-
-  template <typename R, typename F>
-  R reduce(F f, R r= R())
-  {
-    for(auto &e: t) f(r, e);
-    return r;
-  }
-
-  template <typename R>
-  R sum(R r= R())
-  {
-    return reduce([](R &pr, VT const &e){ pr+= e; }, r);
-  }
-};
-
-template <typename T>
-struct View 
-{
-  typedef typename T::value_type VT;
-  T &t;
-
-  View(T &t)
-  : t(t)
-  {}
-
-  View(View const &)= delete;
-  View &operator= (View const &)= delete;
-  
-  View(View &&v)
-  : t(v.t)
-  {}
-
-  template <typename F>
-  View &each(F f)
-  {
-    for(auto &e: t) f(e);
-    return *this;
-  }
-
-  template <typename F>
-  View const &each(F f) const
-  {
-    for(auto const &e: t) f(e);
-    return *this;
-  }
-
-  template <typename F>
-  CopyView<T> map(F f)
-  {
-    T c;
-    c.reserve(t.size());
-    for(auto &e: t) c.emplace_back(f(e));
-    return CopyView<T>(c);
-  }
-
-  template <typename R, typename F>
-  R reduce(F f, R r= R())
-  {
-    for(auto &e: t) f(r, e);
-    return r;
-  }
-
-  template <typename R>
-  R sum(R r= R())
-  {
-    return reduce([](R &pr, VT const &e){ pr+= e; }, r);
-  }
-};
-
-template <typename T>
-struct RangeView 
-{
-  typedef typename T::value_type VT;
-  T begin, end;
-
-  RangeView(T begin, T end)
-  : begin(begin)
-  , end(end)
-  {}
-
-  RangeView(RangeView const &)= delete;
-  RangeView &operator= (RangeView const &)= delete;
-  
-  RangeView(RangeView &&v)
-  : begin(v.begin)
-  , end(v.end)
-  {}
-
-  template <typename F>
-  RangeView &each(F f)
-  {
-    for(T b= begin; b!= end; ++ b) f(*b);
-    return *this;
-  }
-
-  template <typename F>
-  RangeView const &each(F f) const
-  {
-    for(T b= begin; b!= end; ++ b) f(*b);
-    return *this;
-  }
-
-  template <typename F>
-  CopyView<std::vector<T>> map(F f)
-  {
-    std::vector<T> c;
-    for(T b= begin; b!= end; ++ b)
-      c.emplace_back(f(*b));
-    return CopyView<std::vector<T>>(c);
-  }
-
-  template <typename R, typename F>
-  R reduce(F f, R r= R())
-  {
-    for(T b= begin; b!= end; ++ b)
-      f(r, *b);
-    return r;
-  }
-
-  template <typename R>
-  R sum(R r= R())
-  {
-    return reduce([](R &pr, VT const &e){ pr+= e; }, r);
-  }
-};
-
-template <typename T>
-CopyView<T> view(T const &t)
-{
-  return CopyView<T>(t);
+  std::vector<int> v{ 1, 2, 3 };
+  int sum= view(v).each([](int &i){ i+= 1; }).sum(0);
+  EXPECT_EQ(sum, 9);
 }
 
-template <typename T>
-View<T> view(T &t)
+TEST(PwnedView, ConstView)
 {
-  return View<T>(t);
+  std::vector<int> v{ 1, 2, 3 };
+  std::vector<int>::size_type vi= 0;
+  view(std::vector<int>{ 1, 2, 3 }).each([&](int const &i){ v[vi]+= i; ++ vi; });
+  int sum= view(v).sum(0);
+  EXPECT_EQ(sum, 12);
 }
 
-template <typename T>
-RangeView<T> view(T begin, T end)
+TEST(PwnedView, CopyView)
 {
-  return RangeView<T>(begin, end);
+  std::vector<int> v{ 1, 2, 3 };
+  int sum= view(v).each([](int &i){ i+= 1; }).
+    map([](int i){ return i* 2; }).
+    each([](int &i){ return i+= 1; }).
+    select([](int const &i){ return i< 8; }).
+    sum(0);
+  EXPECT_EQ(sum, 12);
 }
 
-int main()
+TEST(PwnedView, RangeView)
 {
-  std::vector<int> v;
-  v.reserve(30);
-  v.emplace_back(1);
-  v.emplace_back(2);
-  v.emplace_back(3);
-  view(v.begin(), v.end()).each([](int &i){ i+= 1; });
+  std::vector<int> v{ 1, 2, 3 };
+  int sum= view(v.begin(), v.end()).select([](int const &i){ return i< 3; }).sum(0);
+  EXPECT_EQ(sum, 3);
+}
+
+int main(int argc, char **argv) 
+{
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }
 

@@ -2,6 +2,7 @@
 #include "view.hpp"
 
 using pwned::view::view;
+using pwned::view::Generate;
 
 TEST(PwnedView, View)
 {
@@ -35,6 +36,13 @@ TEST(PwnedView, RangeView)
   std::vector<int> v{ 1, 2, 3 };
   int sum= view(v.begin(), v.end()).select([](int const &i){ return i< 3; }).sum(0);
   EXPECT_EQ(sum, 3);
+}
+
+TEST(PwnedView, Generator)
+{
+  auto range= pwned::view::generate(1, 10);
+  int sum= view(range.first, range.second).sum(0);
+  EXPECT_EQ(sum, 55);
 }
 
 int main(int argc, char **argv) 

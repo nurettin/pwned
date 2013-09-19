@@ -2,6 +2,7 @@
 #define PWNED_VIEW_HPP
 
 #include <vector>
+#include <functional>
 
 namespace pwned { namespace view {
 
@@ -174,7 +175,7 @@ struct RangeView
   }
 
   template <typename F>
-  RangeView const &each(F f) const
+  RangeView &each(F f) const
   {
     for(T b= begin; b!= end; ++ b) f(*b);
     return *this;
@@ -228,6 +229,46 @@ template <typename T>
 RangeView<T> view(T begin, T end)
 {
   return RangeView<T>(begin, end);
+}
+
+template <typename T>
+struct Generate
+{
+  typedef T value_type;
+  typedef std::function<bool(T &)> F;
+  F f;
+  T value;
+  bool done;
+
+  Generate(): f([](T &){ return true; }), value(T()), done(true) {}
+  Generate(F f, T start= T()): f(f), value(start), done(false) {}
+
+  bool operator!= (Generate const &g) { return done!= g.done; }
+  
+  Generate const &operator++ ()
+  {
+    if(!done) done= !f(value);
+    return *this;
+  }
+
+  T operator* () const
+  {
+    return value;
+  }
+};
+
+template <typename T, typename F= std::function<bool(T &)> >
+std::pair<Generate<T>, Generate<T> > 
+generate(F f, T const &t)
+{
+  return std::make_pair(Generate<T>(f, t), Generate<T>());
+}
+
+template <typename T>
+std::pair<Generate<T>, Generate<T> >
+generate(T const &begin, T const &end)
+{
+  return generate([&](T &i){ i+= 1; return i<= end; }, begin);
 }
 
 } } // pwned view

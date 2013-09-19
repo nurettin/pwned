@@ -33,7 +33,7 @@ struct CopyView
   {
     T c;
     c.reserve(t.size());
-    for(auto &e: t) c.emplace_back(f(e));
+    for(auto const &e: t) c.emplace_back(f(e));
     return CopyView(c);
   }
 
@@ -41,14 +41,14 @@ struct CopyView
   CopyView select(F f)
   {
     T c;
-    for(auto &e: t) if(f(e)) c.emplace_back(e);
+    for(auto const &e: t) if(f(e)) c.emplace_back(e);
     return CopyView(c);
   }
 
   template <typename R, typename F>
   R reduce(F f, R r= R()) const
   {
-    for(auto &e: t) f(r, e);
+    for(auto const &e: t) f(r, e);
     return r;
   }
 
@@ -81,7 +81,7 @@ struct View
   {
     T c;
     c.reserve(t.size());
-    for(auto &e: t) c.emplace_back(f(e));
+    for(auto const &e: t) c.emplace_back(f(e));
     return CopyView<T>(c);
   }
 
@@ -89,14 +89,14 @@ struct View
   CopyView<T> select(F f)
   {
     T c;
-    for(auto &e: t) if(f(e)) c.emplace_back(e);
+    for(auto const &e: t) if(f(e)) c.emplace_back(e);
     return CopyView<T>(c);
   }
 
   template <typename R, typename F>
   R reduce(F f, R r= R()) const
   {
-    for(auto &e: t) f(r, e);
+    for(auto const &e: t) f(r, e);
     return r;
   }
 
@@ -129,7 +129,7 @@ struct ConstView
   {
     T c;
     c.reserve(t.size());
-    for(auto &e: t) c.emplace_back(f(e));
+    for(auto const &e: t) c.emplace_back(f(e));
     return CopyView<T>(c);
   }
 
@@ -137,14 +137,14 @@ struct ConstView
   CopyView<T> select(F f)
   {
     T c;
-    for(auto &e: t) if(f(e)) c.emplace_back(e);
+    for(auto const &e: t) if(f(e)) c.emplace_back(e);
     return CopyView<T>(c);
   }
 
   template <typename R, typename F>
   R reduce(F f, R r= R()) const
   {
-    for(auto &e: t) f(r, e);
+    for(auto const &e: t) f(r, e);
     return r;
   }
 

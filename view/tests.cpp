@@ -23,10 +23,11 @@ TEST(PwnedView, ConstView)
 TEST(PwnedView, CopyView)
 {
   std::vector<int> v{ 1, 2, 3 };
-  int sum= view(v).each([](int &i){ i+= 1; }).
+  int sum= view(v).
+    each([](int &i){ i+= 1; }).
     map([](int i){ return i* 2; }).
-    each([](int &i){ return i+= 1; }).
-    select([](int const &i){ return i< 8; }).
+    each([](int &i){ i+= 1; }).
+    select([](int i){ return i< 8; }).
     sum(0);
   EXPECT_EQ(sum, 12);
 }

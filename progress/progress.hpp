@@ -105,10 +105,10 @@ struct Progress
     DurationParts estimate_parts(estimate());
     int64_t percent= 100* ticks/ total_ticks;
     DurationParts elapsed_parts((milliseconds(elapsed_milliseconds)));
-    std::cout
-      << "("<< elapsed_parts <<") "
-      << bar()
-      << " (% "<< std::setw(3)<< std::setfill(' ')<< percent <<") ("
+    std::cout<< "("
+      << elapsed_parts <<") "
+      << bar()<< " (% "<< std::setw(3)<< std::setfill(' ')
+      << percent <<") ("
       << estimate_parts<< ")\r"<< std::flush;
   }
 

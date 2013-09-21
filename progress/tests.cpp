@@ -1,132 +1,26 @@
-#include <iostream>
-#include <iomanip>
-#include <chrono>
-#include <ctime>
+#include <gtest/gtest.h>
+#include "progress.hpp"
 
-using namespace std::chrono;
-
-struct DurationParts
+TEST(PwnedProgress, DurationParts)
 {
-  hours h;
-  minutes m;
-  seconds s;
-  milliseconds ms;
-
-  DurationParts(milliseconds d)
-  {
-    h = duration_cast<hours>(d);
-    d -= h;
-    m = duration_cast<minutes>(d);
-    d -= m;
-    s = duration_cast<seconds>(d);
-    d -= s;
-    ms = duration_cast<milliseconds>(d);
-  }
-};
-
-std::ostream &operator<< (std::ostream &o, DurationParts const &dp)
-{
-  return o<< std::setfill('0')
-    << std::setw(2)<< dp.h.count()<< ":"
-    << std::setw(2)<< dp.m.count()<< ":"
-    << std::setw(2)<< dp.s.count()<< "."
-    << std::setw(3)<< dp.ms.count();
+  pwned::progress::DurationParts dp(std::chrono::milliseconds(12312312));
+  EXPECT_EQ(3, dp.h.count());
+  EXPECT_EQ(25, dp.m.count());
+  EXPECT_EQ(12, dp.s.count());
+  EXPECT_EQ(312, dp.ms.count());
 }
 
-struct Progress
+TEST(PwnedProgress, Estimate)
 {
-  uint64_t total_ticks, ticks;
-  int total_bar_width, bar_width;
-  void(Progress::* tick_ptr)();
-  steady_clock::time_point start;
-  int64_t elapsed_milliseconds;
+  pwned::progress::Progress p(10);
+  p.elapsed_milliseconds= 10000;
+  p.ticks= 5;
+  EXPECT_EQ(10000, p.estimate().count());
+}
 
-  Progress(uint64_t total_ticks)
-  : total_ticks(total_ticks)
-  , ticks(0)
-  , total_bar_width(50)
-  , bar_width(0)
-  , tick_ptr(&Progress::first_tick)
-  , start(steady_clock::now())
-  , elapsed_milliseconds(0)
-  {}
-
-  void first_tick()
-  {
-    tick_ptr= &Progress::continue_tick;
-    std::cout<< '\n';
-    continue_tick();
-  }
-
-  void continue_tick()
-  {
-    ticks+= 1;
-    bar_width= total_bar_width* ticks/ total_ticks;
-    print();
-  }
-
-  void tick()
-  {
-    (this->* tick_ptr)();
-  }
-
-  milliseconds
-  estimate()
-  {
-    elapsed_milliseconds= duration_cast<milliseconds>(steady_clock::now()- start).count();
-    int64_t average_tick_milliseconds= 0;
-    if(ticks> 0)
-      average_tick_milliseconds= elapsed_milliseconds/ ticks;
-    uint64_t remaining_ticks= total_ticks- ticks;
-    auto estimate_ms= milliseconds(average_tick_milliseconds* remaining_ticks);
-    /*
-    std::cout
-      << "elapsed_milliseconds: "<< elapsed_milliseconds
-      << "\nticks: "<< ticks
-      << "\naverage_tick_milliseconds: "<< average_tick_milliseconds
-      << "\nremaining_ticks: "<< remaining_ticks
-      << "\nestimate_ms.count(): "<< estimate_ms.count()
-      << std::endl;*/
-    return estimate_ms;
-  }
-
-  std::string bar() const
-  {
-    int blank= total_bar_width- bar_width;
-    std::string bar= "|";
-    if(bar_width> 0)
-      bar+= std::string(bar_width, '=');
-    bar+= ">";
-    if(blank> 0)
-      bar+= std::string(blank, ' ');
-    bar+= "|";
-    return bar;
-  }
-
-  void print()
-  {
-    DurationParts estimate_parts(estimate());
-    int64_t percent= 100* ticks/ total_ticks;
-    DurationParts elapsed_parts((milliseconds(elapsed_milliseconds)));
-    std::cout
-      << "("<< elapsed_parts <<") "
-      << bar()
-      << " (% "<< std::setw(3)<< std::setfill(' ')<< percent <<") ("
-      << estimate_parts<< ")\r"<< std::flush;
-  }
-
-};
-
-#include <thread>
-
-int main()
+int main(int argc, char **argv) 
 {
-  Progress p(10);
-  for(int n= 0; n< 10; ++ n)
-  {
-    std::this_thread::sleep_for(milliseconds(300));
-    p.tick();
-  }
-  std::cout<< "test"<< std::endl;
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }
 

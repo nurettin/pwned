@@ -43,7 +43,7 @@ struct Progress
   uint64_t total_ticks, ticks;
   int total_bar_width, bar_width;
   void(Progress::* tick_ptr)();
-  time_point<std::chrono::steady_clock> start;
+  time_point<steady_clock> start;
   int64_t elapsed_milliseconds;
 
   Progress(uint64_t total_ticks)

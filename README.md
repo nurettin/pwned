@@ -34,6 +34,10 @@ Simple jsoncpp interface
 
 Simple leveldb interface. Supports reverse iteration between two values!
 
+## pwned::progress
+
+Display progressbar. Uses average tick time for estimating TTC.
+
 ## pwned::pretty
 
 Output C++ containers to streams. Supports adding print functions for new types.

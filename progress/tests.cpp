@@ -3,12 +3,43 @@
 #include <chrono>
 #include <ctime>
 
+using namespace std::chrono;
+
+struct DurationParts
+{
+  hours h;
+  minutes m;
+  seconds s;
+  milliseconds ms;
+
+  DurationParts(milliseconds d)
+  {
+    h = duration_cast<hours>(d);
+    d -= h;
+    m = duration_cast<minutes>(d);
+    d -= m;
+    s = duration_cast<seconds>(d);
+    d -= s;
+    ms = duration_cast<milliseconds>(d);
+  }
+};
+
+std::ostream &operator<< (std::ostream &o, DurationParts const &dp)
+{
+  return o<< std::setfill('0')
+    << std::setw(2)<< dp.h.count()<< ":"
+    << std::setw(2)<< dp.m.count()<< ":"
+    << std::setw(2)<< dp.s.count()<< "."
+    << std::setw(3)<< dp.ms.count();
+}
+
 struct Progress
 {
   uint64_t total_ticks, ticks;
   int total_bar_width, bar_width;
   void(Progress::* tick_ptr)();
-  std::chrono::steady_clock::time_point start;
+  steady_clock::time_point start;
+  int64_t elapsed_milliseconds;
 
   Progress(uint64_t total_ticks)
   : total_ticks(total_ticks)
@@ -16,12 +47,13 @@ struct Progress
   , total_bar_width(50)
   , bar_width(0)
   , tick_ptr(&Progress::first_tick)
+  , start(steady_clock::now())
+  , elapsed_milliseconds(0)
   {}
 
   void first_tick()
   {
     tick_ptr= &Progress::continue_tick;
-    start= std::chrono::steady_clock::now();
     std::cout<< '\n';
     continue_tick();
   }
@@ -38,18 +70,19 @@ struct Progress
     (this->* tick_ptr)();
   }
 
-  std::chrono::milliseconds
-  estimate() const
+  milliseconds
+  estimate()
   {
-    int64_t elapsed_milliseconds= std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()- start).count();
+    elapsed_milliseconds= duration_cast<milliseconds>(steady_clock::now()- start).count();
     int64_t average_tick_milliseconds= 0;
-    if(elapsed_milliseconds> 0)
+    if(ticks> 0)
       average_tick_milliseconds= elapsed_milliseconds/ ticks;
     uint64_t remaining_ticks= total_ticks- ticks;
-    auto estimate_ms= std::chrono::milliseconds(average_tick_milliseconds* remaining_ticks);
-/*
+    auto estimate_ms= milliseconds(average_tick_milliseconds* remaining_ticks);
+    /*
     std::cout
       << "elapsed_milliseconds: "<< elapsed_milliseconds
+      << "\nticks: "<< ticks
       << "\naverage_tick_milliseconds: "<< average_tick_milliseconds
       << "\nremaining_ticks: "<< remaining_ticks
       << "\nestimate_ms.count(): "<< estimate_ms.count()
@@ -70,24 +103,16 @@ struct Progress
     return bar;
   }
 
-  void print() const
+  void print()
   {
-    auto d= estimate();
-    auto h = std::chrono::duration_cast<std::chrono::hours>(d);
-    d -= h;
-    auto m = std::chrono::duration_cast<std::chrono::minutes>(d);
-    d -= m;
-    auto s = std::chrono::duration_cast<std::chrono::seconds>(d);
-    d -= s;
-    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(d);
-
-    std::cout<< "(elapsed) "<< bar()<< " (percent) ("
-      << std::setfill('0')
-      << std::setw(2)<< h.count()<< ":"
-      << std::setw(2)<< m.count()<< ":"
-      << std::setw(2)<< s.count()<< "."
-      << std::setw(3)<< ms.count()<< ")\r"
-      << std::flush;
+    DurationParts estimate_parts(estimate());
+    int64_t percent= 100* ticks/ total_ticks;
+    DurationParts elapsed_parts((milliseconds(elapsed_milliseconds)));
+    std::cout
+      << "("<< elapsed_parts <<") "
+      << bar()
+      << " (% "<< std::setw(3)<< std::setfill(' ')<< percent <<") ("
+      << estimate_parts<< ")\r"<< std::flush;
   }
 
 };
@@ -99,8 +124,9 @@ int main()
   Progress p(10);
   for(int n= 0; n< 10; ++ n)
   {
+    std::this_thread::sleep_for(milliseconds(300));
     p.tick();
-    std::this_thread::sleep_for(std::chrono::seconds(1));
   }
+  std::cout<< "test"<< std::endl;
 }
 

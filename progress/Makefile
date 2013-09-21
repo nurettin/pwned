@@ -1,4 +1,4 @@
 all:
-	@$(CXX) tests.cpp -g -ggdb3 -Wextra -Wall -std=c++11 -l pthread -l gtest
+	@$(CXX) tests.cpp -Wextra -Wall -std=c++11 -l pthread -l gtest -I .
 	@./a.out
 	@rm a.out

@@ -12,7 +12,7 @@ TEST(PwnedProgress, DurationParts)
 
 TEST(PwnedProgress, Estimate)
 {
-  pwned::progress::Progress p(10);
+  pwned::progress::Progress<std::chrono::high_resolution_clock> p(10);
   p.elapsed_milliseconds= 10000;
   p.ticks= 5;
   EXPECT_EQ(10000, p.estimate().count());

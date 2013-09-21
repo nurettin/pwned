@@ -38,12 +38,13 @@ std::ostream &operator<< (std::ostream &o, DurationParts const &dp)
     << std::setw(3)<< dp.ms.count();
 }
 
+template <typename clock>
 struct Progress
 {
   uint64_t total_ticks, ticks;
   int total_bar_width, bar_width;
   void(Progress::* tick_ptr)();
-  time_point<steady_clock> start;
+  time_point<clock> start;
   int64_t elapsed_milliseconds;
 
   Progress(uint64_t total_ticks)
@@ -52,7 +53,7 @@ struct Progress
   , total_bar_width(50)
   , bar_width(0)
   , tick_ptr(&Progress::first_tick)
-  , start(steady_clock::now())
+  , start(clock::now())
   , elapsed_milliseconds(0)
   {}
 
@@ -67,7 +68,7 @@ struct Progress
   {
     ticks+= 1;
     bar_width= total_bar_width* ticks/ total_ticks;
-    elapsed_milliseconds= duration_cast<milliseconds>(steady_clock::now()- start).count();
+    elapsed_milliseconds= duration_cast<milliseconds>(clock::now()- start).count();
     print();
   }
 

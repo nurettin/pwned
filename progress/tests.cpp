@@ -1,3 +1,4 @@
+#include <sstream>
 #include <gtest/gtest.h>
 #include "progress.hpp"
 
@@ -8,6 +9,14 @@ TEST(PwnedProgress, DurationParts)
   EXPECT_EQ(25, dp.m.count());
   EXPECT_EQ(12, dp.s.count());
   EXPECT_EQ(312, dp.ms.count());
+}
+
+TEST(PwnedProgress, DurationPartsOutput)
+{
+  std::ostringstream os;
+  pwned::progress::DurationParts dp(boost::chrono::milliseconds(12312312));
+  os<< dp;
+  EXPECT_EQ("03:25:12.312", os.str());
 }
 
 TEST(PwnedProgress, Estimate)

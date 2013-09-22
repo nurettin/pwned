@@ -70,7 +70,7 @@ CURL* perform(std::string const &url, containerT &c, CURL* curl, bool session, s
 }
 
 template <typename containerT>
-CURL* get(std::string const &url, containerT &c, CURL* curl= curl_easy_init(), bool session= true)
+CURL* get(std::string const &url, containerT &c, CURL* curl= curl_easy_init(), bool session= false)
 {
   return perform(url, c, curl, session, [&](){
     check(curl_easy_setopt(curl, CURLOPT_HTTPGET, 1));
@@ -78,7 +78,7 @@ CURL* get(std::string const &url, containerT &c, CURL* curl= curl_easy_init(), b
 }
 
 template <typename containerT>
-CURL* post(std::string const &url, containerT &c, char const* params_string, CURL* curl= curl_easy_init(), bool session= true)
+CURL* post(std::string const &url, containerT &c, char const* params_string, CURL* curl= curl_easy_init(), bool session= false)
 {
   return perform(url, c, curl, session, [&](){
     check(curl_easy_setopt(curl, CURLOPT_POSTFIELDS, params_string));

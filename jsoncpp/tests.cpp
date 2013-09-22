@@ -8,6 +8,11 @@ TEST(PwnedJson, ToString)
   EXPECT_EQ(json.string(), str);
 }
 
+TEST(PwnedJson, Error)
+{
+  EXPECT_THROW(pwned::jsoncpp::Json("{\"x\": x}"), std::runtime_error);
+}
+
 int main(int argc, char **argv) 
 {
   ::testing::InitGoogleTest(&argc, argv);

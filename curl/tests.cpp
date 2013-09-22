@@ -8,7 +8,7 @@
 #include "curl.hpp"
 #include "formicator.hpp"
 
-struct Env: ::testing::Environment 
+struct CurlEnv: ::testing::Environment 
 {
   static pwned::curl::Formicator* f;
   void SetUp() 
@@ -24,20 +24,11 @@ struct Env: ::testing::Environment
   }
 };
 
-pwned::curl::Formicator* Env::f(0);
+pwned::curl::Formicator* CurlEnv::f(0);
 
 TEST(PwnedCurl, InvalidUrl) 
 {
-  bool throws_on_invalid_url= false;
-  try
-  {
-    std::string result= pwned::curl::open("wtf");
-  }
-  catch(std::runtime_error &)
-  {
-    throws_on_invalid_url= true;
-  }
-  EXPECT_EQ(throws_on_invalid_url, true);
+  EXPECT_THROW(pwned::curl::open("wtf"), std::runtime_error);
 }
 
 TEST(PwnedCurl, LocalFile) 
@@ -53,35 +44,37 @@ TEST(PwnedCurl, ValidUrl)
 
 TEST(PwnedCurlFormicator, Get)
 {
-  Env::f-> get("/html");
-  EXPECT_EQ(boost::algorithm::starts_with(Env::f-> page, "<!DOCTYPE html>"), true);
+  CurlEnv::f-> get("/html");
+  EXPECT_EQ(boost::algorithm::starts_with(CurlEnv::f-> page, "<!DOCTYPE html>"), true);
 }
 
 TEST(PwnedCurlFormicator, Post)
 {
-  Env::f-> post("/post", { { "abc", "123" } });
-  EXPECT_EQ(boost::algorithm::contains(Env::f-> page, "\"abc\": \"123\""), true);
+  CurlEnv::f-> post("/post", { { "abc", "123" }, { "def", "456" } });
+  EXPECT_EQ(boost::algorithm::contains(CurlEnv::f-> page, "\"abc\": \"123\""), true);
+  EXPECT_EQ(boost::algorithm::contains(CurlEnv::f-> page, "\"def\": \"456\""), true);
 }
 
 TEST(PwnedCurlFormicator, Cookies)
 {
-  Env::f-> get("/cookies/set?session=sessionid123");
-  Env::f-> get("/cookies");
-  EXPECT_EQ(boost::algorithm::contains(Env::f-> page, "\"session\": \"sessionid123\""), true);
+  CurlEnv::f-> get("/cookies/set?session=sessionid123");
+  CurlEnv::f-> get("/cookies");
+  EXPECT_EQ(boost::algorithm::contains(CurlEnv::f-> page, "\"session\": \"sessionid123\""), true);
 }
 
 TEST(PwnedCurlFormicator, Find)
 {
-  Env::f-> get("/html");
-  auto h1= Env::f-> find("h1");
+  CurlEnv::f-> get("/html");
+  auto h1= CurlEnv::f-> find("h1");
   ASSERT_TRUE(h1!= 0);
+  ASSERT_TRUE(h1-> first_child!= 0);
   EXPECT_EQ(h1-> first_child-> data.text(), "Herman Melville - Moby-Dick");
 }
 
 int main(int argc, char **argv) 
 {
   ::testing::InitGoogleTest(&argc, argv);
-  ::testing::AddGlobalTestEnvironment(new Env);
+  ::testing::AddGlobalTestEnvironment(new CurlEnv);
   return RUN_ALL_TESTS();
 }
 

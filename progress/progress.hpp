@@ -5,11 +5,11 @@
 #include <ostream>
 #include <iomanip>
 #include <ctime>
-#include <boost/chrono.hpp>
+#include <chrono>
 
 namespace pwned { namespace progress {
 
-using namespace boost::chrono;
+using namespace std::chrono;
 
 struct DurationParts
 {
@@ -119,7 +119,7 @@ struct ProgressClock
   }
 };
 
-typedef ProgressClock<steady_clock> Progress;
+typedef ProgressClock<std::chrono::high_resolution_clock> Progress;
 
 } } // pwned progress
 

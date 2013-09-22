@@ -1,11 +1,12 @@
 #include <sstream>
 #include <algorithm>
 #include <gtest/gtest.h>
+#include <chrono>
 #include "progress.hpp"
 
 TEST(PwnedProgress, DurationParts)
 {
-  pwned::progress::DurationParts dp(boost::chrono::milliseconds(12312312));
+  pwned::progress::DurationParts dp(std::chrono::milliseconds(12312312));
   EXPECT_EQ(3, dp.h.count());
   EXPECT_EQ(25, dp.m.count());
   EXPECT_EQ(12, dp.s.count());

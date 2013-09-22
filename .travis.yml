@@ -23,5 +23,4 @@ before_install:
   - make -j4
   - cd -
 script: make
-after_success: 
-  - if [ "$CXX" = "g++" ]; then coveralls; fi
+after_success: coveralls

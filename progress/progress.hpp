@@ -2,6 +2,7 @@
 #define PWNED_PROGRESS_HPP
 
 #include <iostream>
+#include <ostream>
 #include <iomanip>
 #include <ctime>
 #include <boost/chrono.hpp>
@@ -42,32 +43,32 @@ template <typename clock>
 struct ProgressClock
 {
   uint64_t total_ticks, ticks;
-  int total_bar_width, bar_width;
+  int total_bar_width;
   void(ProgressClock::* tick_ptr)();
   time_point<clock> start;
   int64_t elapsed_milliseconds;
+  std::ostream &out;
 
-  ProgressClock(uint64_t total_ticks)
+  ProgressClock(uint64_t total_ticks, std::ostream &out= std::cout)
   : total_ticks(total_ticks)
   , ticks(0)
   , total_bar_width(50)
-  , bar_width(0)
   , tick_ptr(&ProgressClock::first_tick)
   , start(clock::now())
   , elapsed_milliseconds(0)
+  , out(out)
   {}
 
   void first_tick()
   {
     tick_ptr= &ProgressClock::continue_tick;
-    std::cout<< '\n';
+    out<< '\n';
     continue_tick();
   }
 
   void continue_tick()
   {
     ticks+= 1;
-    bar_width= total_bar_width* ticks/ total_ticks;
     elapsed_milliseconds= duration_cast<milliseconds>(clock::now()- start).count();
     print();
   }
@@ -77,19 +78,18 @@ struct ProgressClock
     (this->* tick_ptr)();
   }
 
-  milliseconds
-  estimate()
+  milliseconds estimate() const
   {
     int64_t average_tick_milliseconds= 0;
     if(ticks> 0)
       average_tick_milliseconds= elapsed_milliseconds/ ticks;
     uint64_t remaining_ticks= total_ticks- ticks;
-    auto estimate_ms= milliseconds(average_tick_milliseconds* remaining_ticks);
-    return estimate_ms;
+    return milliseconds(average_tick_milliseconds* remaining_ticks);
   }
 
   std::string bar() const
   {
+    int bar_width= total_bar_width* ticks/ total_ticks;
     int blank= total_bar_width- bar_width;
     std::string bar= "|";
     if(bar_width> 0)
@@ -106,7 +106,7 @@ struct ProgressClock
     DurationParts estimate_parts(estimate());
     int64_t percent= 100* ticks/ total_ticks;
     DurationParts elapsed_parts((milliseconds(elapsed_milliseconds)));
-    std::cout<< "("
+    out<< "("
       << elapsed_parts <<") "
       << bar()<< " (% "<< std::setw(3)<< std::setfill(' ')
       << percent <<") ("
@@ -115,9 +115,8 @@ struct ProgressClock
 
   ~ProgressClock()
   {
-    std::cout<< std::endl;
+    out<< std::endl;
   }
-
 };
 
 typedef ProgressClock<steady_clock> Progress;

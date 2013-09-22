@@ -3,12 +3,12 @@
 
 #include <iostream>
 #include <iomanip>
-#include <chrono>
 #include <ctime>
+#include <boost/chrono.hpp>
 
 namespace pwned { namespace progress {
 
-using namespace std::chrono;
+using namespace boost::chrono;
 
 struct DurationParts
 {
@@ -39,27 +39,27 @@ std::ostream &operator<< (std::ostream &o, DurationParts const &dp)
 }
 
 template <typename clock>
-struct Progress
+struct ProgressClock
 {
   uint64_t total_ticks, ticks;
   int total_bar_width, bar_width;
-  void(Progress::* tick_ptr)();
+  void(ProgressClock::* tick_ptr)();
   time_point<clock> start;
   int64_t elapsed_milliseconds;
 
-  Progress(uint64_t total_ticks)
+  ProgressClock(uint64_t total_ticks)
   : total_ticks(total_ticks)
   , ticks(0)
   , total_bar_width(50)
   , bar_width(0)
-  , tick_ptr(&Progress::first_tick)
+  , tick_ptr(&ProgressClock::first_tick)
   , start(clock::now())
   , elapsed_milliseconds(0)
   {}
 
   void first_tick()
   {
-    tick_ptr= &Progress::continue_tick;
+    tick_ptr= &ProgressClock::continue_tick;
     std::cout<< '\n';
     continue_tick();
   }
@@ -113,12 +113,14 @@ struct Progress
       << estimate_parts<< ")\r"<< std::flush;
   }
 
-  ~Progress()
+  ~ProgressClock()
   {
     std::cout<< std::endl;
   }
 
 };
+
+typedef ProgressClock<steady_clock> Progress;
 
 } } // pwned progress
 

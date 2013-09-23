@@ -1,5 +1,4 @@
 all:
-	@$(CXX) tests.cpp -fprofile-arcs -ftest-coverage -Wextra -Wall -pedantic -std=c++11 -l pthread -l gtest
-	@./a.out
+	@$(CXX) tests.cpp -fprofile-arcs -ftest-coverage -std=c++11 -Wextra -Wall -pedantic -l pthread -l gtest
+	@-./a.out
 	@rm a.out
-  

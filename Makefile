@@ -7,6 +7,7 @@ run_tests:
 	@cd jsoncpp && $(MAKE) && cd ..
 	@cd view && $(MAKE) && cd ..
 	@cd progress && $(MAKE) && cd ..
+	@cd parameters && $(MAKE) && cd ..
 	@printf "test LOC:" && wc -l */tests.cpp | grep total
 	@printf "code LOC:" && wc -l */*.hpp | grep total
 

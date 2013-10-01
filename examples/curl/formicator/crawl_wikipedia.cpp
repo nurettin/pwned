@@ -14,8 +14,7 @@ int main()
     if(a== 0) continue;
     auto &data= a-> data;
     data.parseAttributes();
-    auto attr= data.attributes();
-    std::cout<< attr["title"]<< '\n';
+    std::cout<< data.attributes().at("title")<< ' ';
   }
 }
 

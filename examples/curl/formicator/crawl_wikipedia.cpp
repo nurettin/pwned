@@ -1,5 +1,4 @@
 #include <iostream>
-#include <fstream>
 #include <pwned/curl/formicator.hpp>
 
 int main()

@@ -1,6 +1,5 @@
 # pwned
 
-Incomplete code, do not use in production! 
 [![Build Status](https://travis-ci.org/nurettin/pwned.png?branch=master)](https://travis-ci.org/nurettin/pwned)
 [![Coverage Status](https://coveralls.io/repos/nurettin/pwned/badge.png)](https://coveralls.io/r/nurettin/pwned)
 [![Maintenance](http://stillmaintained.com/nurettin/pwned.png)](http://stillmaintained.com/nurettin/pwned)

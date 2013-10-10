@@ -73,7 +73,7 @@ struct Formicator
   {
     hcxselect::Selection selection= selector.select(css);
     if(selection.empty()) return 0;
-    return *select(css).begin();
+    return *selection.begin();
   }
 
 };

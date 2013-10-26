@@ -84,6 +84,16 @@ TEST(PwnedLeveldb, Batch)
   Env::db-> remove("20130913114900");
 }
 
+TEST(PwnedLeveldb, ApproximateSize)
+{
+  Env::db-> put("20130913114800", "abc");
+  Env::db-> put("20130913114805", "def");
+  Env::db-> put("20130913114900", "wtf");
+  ASSERT_GT(Env::db-> approximate_size("2013", "2014"), 0);
+  Env::db-> remove("20130913114800");
+  Env::db-> remove("20130913114805");
+  Env::db-> remove("20130913114900");
+}
 int main(int argc, char **argv) 
 {
   ::testing::InitGoogleTest(&argc, argv);

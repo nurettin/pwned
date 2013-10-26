@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <functional>
 #include <memory>
+#include <boost/optional.hpp>
 #include <leveldb/db.h>
 #include <leveldb/write_batch.h>
 #include <leveldb/comparator.h>
@@ -33,11 +34,13 @@ struct DB
     check_status(db-> Put(write_options, k, v));
   }
 
-  std::string get(::leveldb::Slice const &k)
+  boost::optional<std::string> get(::leveldb::Slice const &k)
   {
     std::string v;
-    check_status(db-> Get(read_options, k, &v));
-    return v;
+    auto status= db-> Get(read_options, k, &v);
+    if(status.ok())
+      return v;
+    return boost::none;
   }
 
   void remove(::leveldb::Slice const &k)

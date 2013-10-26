@@ -26,7 +26,9 @@ TEST(PwnedLeveldb, Put)
 
 TEST(PwnedLeveldb, Get)
 {
-  EXPECT_EQ(Env::db-> get("1"), "hello world");
+  auto result= Env::db-> get("1");
+  ASSERT_NE(result, boost::none);
+  EXPECT_EQ(*result, "hello world");
 }
 
 TEST(PwnedLeveldb, ReverseEach)

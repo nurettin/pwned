@@ -87,15 +87,7 @@ struct DB
     check_status(db-> Write(write_options, &batch));
   }
 
-  uint64_t approximate_size(::leveldb::Slice const &begin, ::leveldb::Slice const &end)
-  {
-    ::leveldb::Range r[1] { ::leveldb::Range(begin, end) };
-    uint64_t s[1] {};
-    db-> GetApproximateSizes(r, 1, s);
-    return s[0];
-  }
-
-  void check_status(::leveldb::Status const &status)
+  void check_status(::leveldb::Status const &status) const
   {
     if(!status.ok())
       throw std::runtime_error(status.ToString());

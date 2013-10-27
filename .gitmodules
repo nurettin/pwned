@@ -1,3 +1,6 @@
 [submodule "hcxselect"]
 	path = hcxselect
 	url = git://github.com/jgehring/hcxselect.git
+[submodule "mongoose"]
+	path = mongoose
+	url = git://github.com/nurettin/mongoose.git

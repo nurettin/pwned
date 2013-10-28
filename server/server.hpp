@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <functional>
 #include <boost/optional.hpp>
+#include <re2/filtered_re2.h>
 #include <mongoose.h>
 
 namespace pwned { namespace server {
@@ -27,11 +28,14 @@ struct Server
     routes.insert({ "GET_"+ uri, boost::optional<Event>(block) });
   }
 
-  static std::string response(std::string const &content, std::string const &status= "200 OK")
+  static std::string response(
+    std::string const &content
+    , std::string const &content_type= "text/plain"
+    , std::string const &status= "200 OK")
   {
     std::ostringstream out;
-    out<< "HTTP/1.1 "<< status<<"\r\n"
-      << "Content-Type: text/plain\r\n"
+    out<< "HTTP/1.1 "<< status<< "\r\n"
+      << "Content-Type: "<< content_type<< "\r\n"
       << "Content-Length: "<< content.size()<< "\r\n\r\n"
       << content;
     return out.str();

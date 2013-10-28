@@ -27,6 +27,11 @@ struct Server
     routes.insert({ "GET_"+ uri, boost::optional<Event>(block) });
   }
 
+  void post(std::string const &uri, Event block)
+  {
+    routes.insert({ "POST_"+ uri, boost::optional<Event>(block) });
+  }
+
   static std::string response(std::string const &content, std::string const &status= "200 OK")
   {
     std::ostringstream out;

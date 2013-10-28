@@ -1,15 +1,7 @@
 #include <iostream>
-#include <unordered_map>
 #include <stdexcept>
 #include <memory>
 #include <re2/filtered_re2.h>
-
-void check(RE2::ErrorCode const &code)
-{
-  if(code== RE2::NoError)
-    return;
-  throw std::runtime_error(std::string(1, '0'+ code));
-}
 
 struct Router
 {
@@ -31,7 +23,7 @@ struct Router
     regexes.push_back(regex);
 
     for(std::size_t i= 0; i< regex_indexes.size(); ++ i)
-      filter-> Add(regexes[i], RE2::Options(), &regex_indexes[i]);
+      check(filter-> Add(regexes[i], RE2::Options(), &regex_indexes[i]));
     std::vector<std::string> strs;
     filter-> Compile(&strs);
   }
@@ -39,6 +31,14 @@ struct Router
   int match(std::string const &url)
   {
     return filter-> FirstMatch(url, regex_indexes);
+  }
+
+  private:
+  void check(RE2::ErrorCode const &code)
+  {
+    if(code== RE2::NoError)
+      return;
+    throw std::runtime_error("Error adding regex: "+ std::string(1, '0'+ code));
   }
 };
 

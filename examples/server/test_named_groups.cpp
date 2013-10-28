@@ -1,13 +1,18 @@
 #include <string>
 #include <map>
+#include <iostream>
+#include <vector>
 
 #include <re2/re2.h>
 
 // original from here:
 // http://codingways.blogspot.com/2013/05/how-to-use-named-group-feature-in.html
-bool FindNamedGroups(const std::string &p_regex,const std::string &p_text,std::map<std::string,std::string> *p_group_value)
+bool find_named_groups(
+  std::string const &p_regex
+  , std::string const &p_text
+  , std::map<std::string,std::string>* p_group_value)
 {
-  p_group_value->clear();
+  p_group_value-> clear();
   RE2 rx(p_regex);
   if(!rx.ok())
   {
@@ -16,9 +21,11 @@ bool FindNamedGroups(const std::string &p_regex,const std::string &p_text,std::m
   }
   size_t named_grp_size =rx.NumberOfCapturingGroups();
   const std::map<std::string,int> &grp_to_idx=rx.NamedCapturingGroups();
-  RE2::Arg args[10];
-  std::string vars[10];
-  const RE2::Arg * const p_args[10]={&args[0],&args[1],&args[2],&args[3],&args[4],&args[5],&args[6],&args[7],&args[8],&args[9]};
+  std::vector<RE2::Arg> args(named_grp_size);
+  std::vector<std::string> vars(named_grp_size);
+  std::vector<RE2::Arg*> p_args(named_grp_size);
+  for(std::size_t i= 0; i< named_grp_size; ++ i)
+    p_args[i]= &args[i];
   int var_count=0;
  
   for(var_count=0;var_count<named_grp_size;var_count++)
@@ -26,7 +33,7 @@ bool FindNamedGroups(const std::string &p_regex,const std::string &p_text,std::m
  
   re2::StringPiece sp_input(p_text);
   //after running following function. matched groups value  will be stored in p_args which point to args which point to vars!
-  bool found= RE2::FindAndConsumeN(&sp_input,rx,p_args,named_grp_size);
+  bool found= RE2::FindAndConsumeN(&sp_input,rx,&p_args,named_grp_size);
   if(!found)
   {
     return false ;
@@ -40,3 +47,8 @@ bool FindNamedGroups(const std::string &p_regex,const std::string &p_text,std::m
   return true;
   
 }
+
+int main()
+{
+}
+

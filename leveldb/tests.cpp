@@ -86,6 +86,15 @@ TEST(PwnedLeveldb, Batch)
   Env::db-> remove("20130913114900");
 }
 
+TEST(PwnedLeveldb, Empty)
+{
+  EXPECT_TRUE(Env::db-> empty());
+  Env::db-> put("123", "abc");
+  EXPECT_FALSE(Env::db-> empty());
+  Env::db-> remove("123");
+  EXPECT_TRUE(Env::db-> empty());
+}
+
 int main(int argc, char **argv) 
 {
   ::testing::InitGoogleTest(&argc, argv);

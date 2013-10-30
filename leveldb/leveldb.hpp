@@ -96,6 +96,15 @@ struct DB
       throw std::runtime_error(status.ToString());
   }
   
+  bool empty() const
+  {
+    std::unique_ptr< ::leveldb::Iterator> it(db->NewIterator(read_options));
+    it-> SeekToFirst();
+    it-> Next();
+    if(it-> status().ok() && it-> Valid())
+      return false;
+    return true;
+  }
 };
 
 } }

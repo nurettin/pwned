@@ -100,8 +100,7 @@ struct DB
   {
     std::unique_ptr< ::leveldb::Iterator> it(db->NewIterator(read_options));
     it-> SeekToFirst();
-    it-> Next();
-    if(it-> status().ok() && it-> Valid())
+    if(it-> Valid())
       return false;
     return true;
   }

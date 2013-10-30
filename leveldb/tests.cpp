@@ -14,9 +14,13 @@ struct Env: ::testing::Environment
 
 pwned::leveldb::DB* Env::db(0);
 
-TEST(PwnedLeveldb, Remove)
+TEST(PwnedLeveldb, Empty)
 {
-  Env::db-> remove("1");
+  EXPECT_TRUE(Env::db-> empty());
+  Env::db-> put("123", "abc");
+  EXPECT_FALSE(Env::db-> empty());
+  Env::db-> remove("123");
+  EXPECT_TRUE(Env::db-> empty());
 }
 
 TEST(PwnedLeveldb, Put)
@@ -29,6 +33,11 @@ TEST(PwnedLeveldb, Get)
   auto result= Env::db-> get("1");
   ASSERT_NE(result, boost::none);
   EXPECT_EQ(*result, "hello world");
+}
+
+TEST(PwnedLeveldb, Remove)
+{
+  Env::db-> remove("1");
 }
 
 TEST(PwnedLeveldb, ReverseEach)
@@ -84,15 +93,6 @@ TEST(PwnedLeveldb, Batch)
   Env::db-> remove("20130913114800");
   Env::db-> remove("20130913114805");
   Env::db-> remove("20130913114900");
-}
-
-TEST(PwnedLeveldb, Empty)
-{
-  EXPECT_TRUE(Env::db-> empty());
-  Env::db-> put("123", "abc");
-  EXPECT_FALSE(Env::db-> empty());
-  Env::db-> remove("123");
-  EXPECT_TRUE(Env::db-> empty());
 }
 
 int main(int argc, char **argv) 

@@ -96,6 +96,9 @@ struct DB
       throw std::runtime_error(status.ToString());
   }
   
+  //! Check if leveldb is newly created.
+  /*! Seeks to first element in the database and checks if the iterator is valid.
+  */
   bool empty() const
   {
     std::unique_ptr< ::leveldb::Iterator> it(db->NewIterator(read_options));

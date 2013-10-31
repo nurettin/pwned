@@ -19,11 +19,5 @@ before_install:
   - sudo ln -s /usr/src/gtest/build/libgtest_main.so /usr/lib/libgtest_main.so
   - cd -
   - git submodule update --init --recursive
-  - cd hcxselect
-  - make -j4
-  - cd -
-  - cd re2
-  - make -j4
-  - cd -
 script: make
 after_success: coveralls

@@ -145,16 +145,13 @@ struct Server
     std::string str_post_data(post_data, post_data+ post_data_len);
     std::istringstream parser(str_post_data);
     std::string key, value;
-    char split= 0;
     bool ok= false;
     while(1)
     {
       ok= std::getline(parser, key, '='); if(!ok) break;
-      ok= std::getline(parser, value, '='); if(!ok) break;
+      ok= std::getline(parser, value, '&'); 
       pair_block_param-> second.insert(std::make_pair(key, value));
-      split= 0;
-      ok= parser.get(split); if(!ok) break;
-      if(split!= '&') break;
+      if(!ok) break;
     }
 
     auto response= pair_block_param-> first(event, pair_block_param-> second);

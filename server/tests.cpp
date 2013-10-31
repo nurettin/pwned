@@ -34,6 +34,9 @@ struct ServerEnv: ::testing::Environment
     s-> get("/user/:id/post/:post_id", [](mg_event*, Router::Params const &p) {
       return Server::response("called_get_user_"+ p.at("id")+ "_post_"+ p.at("post_id"));
     });
+    s-> post("/user/create", [](mg_event*, Router::Params const &p) {
+      return Server::response("username: "+ p.at("username")+ " password: "+ p.at("password"));
+    });
   }
   void TearDown() 
   { 
@@ -64,7 +67,12 @@ TEST(PwnedServer, ServerMatch)
   EXPECT_EQ(pwned::curl::open("http://localhost:8080/users"), "called_get_users");
   EXPECT_EQ(pwned::curl::open("http://localhost:8080/user/1"), "called_get_user_1");
   EXPECT_EQ(pwned::curl::open("http://localhost:8080/user/1/post/1"), "called_get_user_1_post_1");
+  std::string result;
+  pwned::curl::post("http://localhost:8080/user/create", result, "username=onur&password=123456");
+  EXPECT_EQ(result, "username: onur password: 123456");
 }
+
+
 
 int main(int argc, char **argv) 
 {

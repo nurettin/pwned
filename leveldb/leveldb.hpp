@@ -12,14 +12,23 @@
 
 namespace pwned { namespace leveldb {
 
+//! Leveldb database operations
 struct DB
 {
+  //! Directory of leveldb database
   std::string directory;
+  //! Persistent write options
   ::leveldb::WriteOptions write_options;
+  //! Persistent read options
   ::leveldb::ReadOptions read_options;
+  //! Persistent options (create_if_missing=true by default)
   ::leveldb::Options options;
+  //! Database instance
   ::leveldb::DB* db;
 
+  //! Open an existing database.
+  /*! Creates a blank database if database is missing.
+  */
   DB(std::string const &directory)
   : directory(directory)
   {
@@ -29,11 +38,15 @@ struct DB
 
   ~DB(){ delete db; }
 
+  //! Record a key-value pair to the leveldb database.
   void put(::leveldb::Slice const &k, ::leveldb::Slice const &v)
   {
     check_status(db-> Put(write_options, k, v));
   }
 
+  //! Get a value according to key if it exists.
+  /*! Returns boost::none if there was an error getting the key.
+  */
   boost::optional<std::string> get(::leveldb::Slice const &k)
   {
     std::string v;
@@ -43,11 +56,13 @@ struct DB
     return boost::none;
   }
 
+  //! Remove a key/value pair from leveldb
   void remove(::leveldb::Slice const &k)
   {
     check_status(db-> Delete(write_options, k));
   }
-  
+
+  //! Call block on leveldb range of keys
   void each(::leveldb::Slice const &begin
     , ::leveldb::Slice const &end
     , std::function<void(std::string const &, std::string const &)> f)
@@ -63,9 +78,10 @@ struct DB
     check_status(it-> status());
   }
 
+  //! Call block on leveldb range of keys in reverse order
   void reverse_each(::leveldb::Slice const &rbegin
     , ::leveldb::Slice const &rend
-    , std::function<void(std::string const &, std::string const &)> f)
+    , std::function<void(std::string const &, std::string const &)> block)
   {
     std::unique_ptr< ::leveldb::Iterator> it(db-> NewIterator(read_options));
     it-> Seek(rbegin); 
@@ -78,24 +94,19 @@ struct DB
       ::leveldb::Slice const &key= it-> key();
       if(options.comparator-> Compare(rend, key)> 0)
         break;
-      f(key.ToString(), it-> value().ToString());
+      block(key.ToString(), it-> value().ToString());
     }
     check_status(it-> status());
   }
 
-  void batch(std::function<void(::leveldb::WriteBatch &batch)> f)
+  //! Call given block as batch operation
+  void batch(std::function<void(::leveldb::WriteBatch &batch)> block)
   {
     ::leveldb::WriteBatch batch;
-    f(batch);
+    block(batch);
     check_status(db-> Write(write_options, &batch));
   }
 
-  void check_status(::leveldb::Status const &status) const
-  {
-    if(!status.ok())
-      throw std::runtime_error(status.ToString());
-  }
-  
   //! Check if leveldb is newly created.
   /*! Seeks to first element in the database and checks if the iterator is valid.
   */
@@ -106,6 +117,13 @@ struct DB
     if(it-> Valid())
       return false;
     return true;
+  }
+
+  //! Check if leveldb status is ok, if not, throw an exception.
+  void check_status(::leveldb::Status const &status) const
+  {
+    if(!status.ok())
+      throw std::runtime_error(status.ToString());
   }
 };
 

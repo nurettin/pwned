@@ -25,16 +25,16 @@ struct ServerEnv: ::testing::Environment
     });
 
     s= new Server("8080");
-    s-> get("/users", [](mg_event*, Router::Params const &) {
+    s-> Get("/users", [](mg_event*, Router::Params const &) {
       return Server::response("called_get_users");
     });
-    s-> get("/user/:id", [](mg_event*, Router::Params const &p) {
+    s-> Get("/user/:id", [](mg_event*, Router::Params const &p) {
       return Server::response("called_get_user_"+ p.at("id"));
     });
-    s-> get("/user/:id/post/:post_id", [](mg_event*, Router::Params const &p) {
+    s-> Get("/user/:id/post/:post_id", [](mg_event*, Router::Params const &p) {
       return Server::response("called_get_user_"+ p.at("id")+ "_post_"+ p.at("post_id"));
     });
-    s-> post("/user/create", [](mg_event*, Router::Params const &p) {
+    s-> Post("/user/create", [](mg_event*, Router::Params const &p) {
       return Server::response("username: "+ p.at("username")+ " password: "+ p.at("password"));
     });
   }

@@ -104,15 +104,11 @@ struct Server
 
   ~Server(){ mg_stop(ctx); }
 
-  void get(std::string const &uri, pwned::server::Router::Event block)
-  {
-    router.add("GET_"+ uri, block);
-  }
-
-  void post(std::string const &uri, pwned::server::Router::Event block)
-  {
-    router.add("POST_"+ uri, block);
-  }
+  void Get(std::string const &uri, pwned::server::Router::Event block){ router.add("GET_"+ uri, block); }
+  void Post(std::string const &uri, pwned::server::Router::Event block){ router.add("POST_"+ uri, block); }
+  void Put(std::string const &uri, pwned::server::Router::Event block){ router.add("PUT_"+ uri, block); }
+  void Patch(std::string const &uri, pwned::server::Router::Event block){ router.add("PATCH_"+ uri, block); }
+  void Delete(std::string const &uri, pwned::server::Router::Event block){ router.add("DELETE_"+ uri, block); }
 
   static std::string response(std::string const &content
     , std::string const &content_type= "text/plain"
@@ -153,9 +149,15 @@ struct Server
       pair_block_param-> second.insert(std::make_pair(key, value));
       if(!ok) break;
     }
-
+    try
+    {
     auto response= pair_block_param-> first(event, pair_block_param-> second);
     mg_printf(event-> conn, "%s", response.c_str());
+    } catch(std::exception &ex)
+    {
+      std::cerr<< "Error: "<< ex.what()<< '\n';
+      return 0;
+    }
     return 1;
   }
 };

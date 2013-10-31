@@ -31,6 +31,9 @@ struct Router
 
   void add(std::string route, Event block)
   {
+    std::size_t rtrim= route.find_last_not_of('/');
+    if(rtrim!= std::string::npos)
+      route= route.substr(0, rtrim);
     re2::RE2::GlobalReplace(&route, re_param_to_regex, sp_param_to_regex);
     filter.reset(new re2::FilteredRE2);
     if(regex_indexes.empty())
@@ -131,7 +134,11 @@ struct Server
     Router* router_ptr= static_cast<Router*>(event-> user_data);
 
     // use router to parse uri and uri parameters
-    auto pair_block_param= router_ptr-> match(std::string(event-> request_info-> request_method)+ "_"+ event-> request_info-> uri);
+    std::string uri(event-> request_info-> uri);
+    std::size_t rtrim= uri.find_last_not_of('/');
+    if(rtrim!= std::string::npos)
+      uri= uri.substr(0, rtrim);
+    auto pair_block_param= router_ptr-> match(std::string(event-> request_info-> request_method)+ "_"+ uri);
     if(!pair_block_param) return 0;
     
     // read post data
@@ -151,8 +158,8 @@ struct Server
     }
     try
     {
-    auto response= pair_block_param-> first(event, pair_block_param-> second);
-    mg_printf(event-> conn, "%s", response.c_str());
+      auto response= pair_block_param-> first(event, pair_block_param-> second);
+      mg_printf(event-> conn, "%s", response.c_str());
     } catch(std::exception &ex)
     {
       std::cerr<< "Error: "<< ex.what()<< '\n';

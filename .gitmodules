@@ -7,3 +7,4 @@
 [submodule "re2"]
 	path = re2
 	url = git://github.com/nelhage/re2.git
+	ignore = dirty

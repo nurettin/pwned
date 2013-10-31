@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <memory>
+#include <boost/optional.hpp>
 #include <re2/filtered_re2.h>
 
 struct Router
@@ -28,9 +29,12 @@ struct Router
     filter-> Compile(&strs);
   }
 
-  int match(std::string const &url)
+  boost::optional<std::string> matching_regex(std::string const &url)
   {
-    return filter-> FirstMatch(url, regex_indexes);
+    int index= filter-> FirstMatch(url, regex_indexes);
+    if(index== -1)
+      return boost::none;
+    return regexes[index];
   }
 
   private:
@@ -47,9 +51,11 @@ int main()
   Router router;
   router.add("GET_/users");
   router.add("GET_/user/(?P<id>\\d+)");
-  int match= router.match("GET_/user/1");
-  if(match!= -1)
-    std::cout<< match<< '\n';
-  else
+  auto regex= router.matching_regex("GET_/user/1");
+  if(!regex)
+  {
     std::cout<< "Regex not found!"<< '\n';
+    return EXIT_SUCCESS;
+  }
+  std::cout<< "match: "<< *regex<< '\n';
 }

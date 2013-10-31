@@ -22,5 +22,8 @@ before_install:
   - cd hcxselect
   - make -j4
   - cd -
+  - cd re2
+  - make -j4
+  - cd -
 script: make
 after_success: coveralls

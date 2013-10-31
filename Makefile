@@ -8,6 +8,7 @@ run_tests:
 	@cd view && $(MAKE) && cd ..
 	@cd progress && $(MAKE) && cd ..
 	@cd parameters && $(MAKE) && cd ..
+	@cd server && $(MAKE) && cd ..
 	@printf "test LOC:" && wc -l */tests.cpp | grep total
 	@printf "code LOC:" && wc -l */*.hpp | grep total
 

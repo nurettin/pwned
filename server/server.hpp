@@ -54,7 +54,8 @@ struct Router
     std::vector<re2::StringPiece> ws(group_size);
     std::vector<re2::RE2::Arg> argv(group_size);
     std::vector<re2::RE2::Arg*> args(group_size);
-    for(std::size_t i= 0; i< group_size; ++i) 
+
+    for(int i= 0; i< group_size; ++ i) 
     {
       args[i]= &argv[i];
       argv[i]= &ws[i];
@@ -72,19 +73,13 @@ struct Router
   {
     std::vector<int> matches;
     bool ok= filter-> AllMatches(uri, regex_indexes, &matches);
-    if(!ok)
-    {
-      std::cout<< "uri: "<< uri<< " did not match any of the regexes\n";
-      return boost::none;
-    }
+    if(!ok) return boost::none;
     for(int match: matches)
     {
       auto params= extract_params(uri, *regexes[match]);
       if(!params) continue;
-      std::cout<< "uri: "<< uri<< " matched regex: "<< regexes[match]-> pattern()<< '\n';
       return std::make_pair(events[match], *params);
     }
-    std::cout<< "uri: "<< uri<< " could not be matched with any found regex.\n";
     return boost::none;
   }
 

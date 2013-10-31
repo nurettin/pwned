@@ -2,19 +2,21 @@
 
 int main()
 {
-  using pwned::server::Server;
+  using namespace pwned::server;
   Server server("8080");
-  server.get("/users", [](mg_event*, pwned::server::Router::Params const &params){
-    return Server::response("<html><body>This is a list of users:<table><tr><td>pwned</td></tr><tr><td>edoceo`</td></tr></table></body></html>", "text/html");
+
+  server.get("/", [](mg_event*, Router::Params const &params) {
+    return Server::response("<a href='/add/42/42'>Add 42 + 42</a>", "text/html");
   });
-  server.get("/user/:id", [](mg_event*, pwned::server::Router::Params const &params){
-    return Server::response("This is user number: "+ params.at("id"));
+
+  server.get("/add/:first/:second", [](mg_event*, Router::Params const &params){
+    int first= std::stoi(params.at("first"));
+    int second= std::stoi(params.at("second"));
+    std::ostringstream out;
+    out<< first<< " + "<< second<< " = "<< (first+ second)<< '\n';
+    return Server::response(out.str());
   });
-  server.get("/user/:id/post/:post_id", [](mg_event*, pwned::server::Router::Params const &params){
-    return Server::response(
-      "This is user number: "+ params.at("id")+ 
-      " and post number: "+ params.at("post_id"));
-  });
+
   std::cin.get();
 }
 

@@ -46,7 +46,7 @@ struct Router
     filter-> Compile(&strs);
   }
 
-  boost::optional<Params> extract_params(std::string const &uri, re2::RE2 const &re)
+  boost::optional<Params> extract_uri_params(std::string const &uri, re2::RE2 const &re)
   {
     re2::StringPiece input(uri);
     int group_size = re.NumberOfCapturingGroups();
@@ -67,7 +67,7 @@ struct Router
       result[cgn.second]= ws[cgn.first- 1].ToString();
     return result;
   }
-
+  
   boost::optional<std::pair<Event, Params>> match(std::string const &uri)
   {
     std::vector<int> matches;
@@ -75,9 +75,9 @@ struct Router
     if(!ok) return boost::none;
     for(int match: matches)
     {
-      auto params= extract_params(uri, *regexes[match]);
-      if(!params) continue;
-      return std::make_pair(events[match], *params);
+      auto uri_params= extract_uri_params(uri, *regexes[match]);
+      if(!uri_params) continue;
+      return std::make_pair(events[match], *uri_params);
     }
     return boost::none;
   }
@@ -109,6 +109,11 @@ struct Server
     router.add("GET_"+ uri, block);
   }
 
+  void post(std::string const &uri, pwned::server::Router::Event block)
+  {
+    router.add("POST_"+ uri, block);
+  }
+
   static std::string response(std::string const &content
     , std::string const &content_type= "text/plain"
     , std::string const &status= "200 OK")
@@ -128,9 +133,30 @@ struct Server
       return 0;
 
     Router* router_ptr= static_cast<Router*>(event-> user_data);
+
+    // use router to parse uri and uri parameters
     auto pair_block_param= router_ptr-> match(std::string(event-> request_info-> request_method)+ "_"+ event-> request_info-> uri);
     if(!pair_block_param) return 0;
-  
+    
+    // read post data
+    char post_data[16* 1024] {}; // 16 kb max post data size
+    int post_data_len= mg_read(event-> conn, post_data, sizeof(post_data));
+
+    std::string str_post_data(post_data, post_data+ post_data_len);
+    std::istringstream parser(str_post_data);
+    std::string key, value;
+    char split= 0;
+    bool ok= false;
+    while(1)
+    {
+      ok= std::getline(parser, key, '='); if(!ok) break;
+      ok= std::getline(parser, value, '='); if(!ok) break;
+      pair_block_param-> second.insert(std::make_pair(key, value));
+      split= 0;
+      ok= parser.get(split); if(!ok) break;
+      if(split!= '&') break;
+    }
+
     auto response= pair_block_param-> first(event, pair_block_param-> second);
     mg_printf(event-> conn, "%s", response.c_str());
     return 1;

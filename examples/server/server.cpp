@@ -36,9 +36,12 @@ int main()
   });
 
   server.Get("/index.html", [](mg_event*, Params const &) {
-    std::ifstream file("index.html");
-    std::istreambuf_iterator<char> begin(file), end;
-    return Server::response(std::string(begin, end), "text/html");
+    std::ifstream file("index.html", std::ios::binary| std::ios::ate);
+    auto size= file.tellg();
+    file.seekg(0, std::ios::beg);
+    std::string buffer(size, 0);
+    file.read(&buffer[0], size);
+    return Server::response(buffer, "text/html");
   });
 
   std::cin.get();

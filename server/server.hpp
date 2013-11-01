@@ -140,7 +140,7 @@ struct Server
     out<< "HTTP/1.1 "<< status<< "\r\n"
       << "Content-Type: "<< content_type<< "\r\n"
       << "Content-Length: "<< content.size()<< "\r\n"
-      << "Server: pwned (backed by mongoose "<< mg_version()<< ")\r\n\r\n"
+      << "Server: pwned_mongoose_"<< mg_version()<< "\r\n\r\n"
       << content;
     return out.str();
   }

@@ -5,8 +5,8 @@
 #include "server.hpp"
 #include "../curl/curl.hpp"
 
-using pwned::server::Router;
-using pwned::server::Server;
+using namespace pwned::server;
+using namespace pwned::curl;
 struct ServerEnv: ::testing::Environment 
 {
   static Router* r;
@@ -14,27 +14,27 @@ struct ServerEnv: ::testing::Environment
   void SetUp() 
   { 
     r= new Router;
-    r-> add("GET_/users", [](mg_event*, Router::Params const &) {
+    r-> add("GET_/users", [](mg_event*, Params const &) {
       return "called_get_users";
     });
-    r-> add("GET_/user/:id", [](mg_event*, Router::Params const &p) {
+    r-> add("GET_/user/:id", [](mg_event*, Params const &p) {
       return "called_get_user_"+ p.at("id");
     });
-    r-> add("GET_/user/:id/post/:post_id", [](mg_event*, Router::Params const &p) {
+    r-> add("GET_/user/:id/post/:post_id", [](mg_event*, Params const &p) {
       return "called_get_user_"+ p.at("id")+ "_post_"+ p.at("post_id");
     });
 
     s= new Server("8080");
-    s-> Get("/users", [](mg_event*, Router::Params const &) {
+    s-> Get("/users", [](mg_event*, Params const &) {
       return Server::response("called_get_users");
     });
-    s-> Get("/user/:id", [](mg_event*, Router::Params const &p) {
+    s-> Get("/user/:id", [](mg_event*, Params const &p) {
       return Server::response("called_get_user_"+ p.at("id"));
     });
-    s-> Get("/user/:id/post/:post_id", [](mg_event*, Router::Params const &p) {
+    s-> Get("/user/:id/post/:post_id", [](mg_event*, Params const &p) {
       return Server::response("called_get_user_"+ p.at("id")+ "_post_"+ p.at("post_id"));
     });
-    s-> Post("/user/create", [](mg_event*, Router::Params const &p) {
+    s-> Post("/user/create", [](mg_event*, Params const &p) {
       return Server::response("username: "+ p.at("username")+ " password: "+ p.at("password"));
     });
   }
@@ -64,11 +64,11 @@ TEST(PwnedServerRouter, RouterMatch)
 
 TEST(PwnedServer, ServerMatch)
 {
-  EXPECT_EQ(pwned::curl::open("http://localhost:8080/users"), "called_get_users");
-  EXPECT_EQ(pwned::curl::open("http://localhost:8080/user/1"), "called_get_user_1");
-  EXPECT_EQ(pwned::curl::open("http://localhost:8080/user/1/post/1"), "called_get_user_1_post_1");
+  EXPECT_EQ(open("http://localhost:8080/users"), "called_get_users");
+  EXPECT_EQ(open("http://localhost:8080/user/1"), "called_get_user_1");
+  EXPECT_EQ(open("http://localhost:8080/user/1/post/1"), "called_get_user_1_post_1");
   std::string result;
-  pwned::curl::post("http://localhost:8080/user/create", result, "username=onur&password=123456");
+  post("http://localhost:8080/user/create", result, "username=onur&password=123456");
   EXPECT_EQ(result, "username: onur password: 123456");
 }
 

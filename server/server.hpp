@@ -11,9 +11,10 @@
 
 namespace pwned { namespace server {
 
+typedef std::map<std::string, std::string> Params;
+
 struct Router
 {
-  typedef std::map<std::string, std::string> Params;
   typedef std::function<std::string(mg_event*, Params const &)> Event;
   std::unique_ptr<re2::FilteredRE2> filter;
   std::vector<int> regex_indexes;
@@ -31,9 +32,6 @@ struct Router
 
   void add(std::string route, Event block)
   {
-    std::size_t rtrim= route.find_last_not_of('/');
-    if(rtrim!= std::string::npos)
-      route= route.substr(0, rtrim);
     re2::RE2::GlobalReplace(&route, re_param_to_regex, sp_param_to_regex);
     filter.reset(new re2::FilteredRE2);
     if(regex_indexes.empty())
@@ -101,8 +99,10 @@ struct Server
 
   Server(char const* port)
   {
+    std::ios_base::sync_with_stdio(false);
     char const* options[]{ "listening_ports", port, 0 };
     ctx = mg_start(options, &Server::event_handler, &router);
+    std::cout<< "Started mongoose "<< mg_version()<< " on port "<< port<< std::endl;
   }
 
   ~Server(){ mg_stop(ctx); }
@@ -135,9 +135,6 @@ struct Server
 
     // use router to parse uri and uri parameters
     std::string uri(event-> request_info-> uri);
-    std::size_t rtrim= uri.find_last_not_of('/');
-    if(rtrim!= std::string::npos)
-      uri= uri.substr(0, rtrim);
     auto pair_block_param= router_ptr-> match(std::string(event-> request_info-> request_method)+ "_"+ uri);
     if(!pair_block_param) return 0;
     

@@ -1,3 +1,6 @@
+#include <iostream>
+#include <iterator>
+#include <fstream>
 #include <server/server.hpp>
 
 int main()
@@ -19,7 +22,7 @@ int main()
     return Server::response(out.str());
   });
 
-  server.Get("/form", [](mg_event*, Params const &params) {
+  server.Get("/form", [](mg_event*, Params const &) {
     return Server::response(
       "<form action='/submit' method='POST'>"
         "<input type='text' name='username' /><br />"
@@ -30,6 +33,12 @@ int main()
 
   server.Post("/submit", [](mg_event*, Params const &params) {
     return Server::response(params.at("username")+ " "+ params.at("password"));
+  });
+
+  server.Get("/index.html", [](mg_event*, Params const &) {
+    std::ifstream file("index.html");
+    std::istreambuf_iterator<char> begin(file), end;
+    return Server::response(std::string(begin, end), "text/html");
   });
 
   std::cin.get();

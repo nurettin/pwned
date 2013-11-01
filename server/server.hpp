@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <memory>
 #include <iostream>
+#include <unordered_map>
 #include <boost/optional.hpp>
 #include <re2/filtered_re2.h>
 #include <mongoose.h>
@@ -20,18 +21,32 @@ struct Router
   std::vector<int> regex_indexes;
   std::vector<std::shared_ptr<RE2>> regexes;
   std::vector<Event> events;
+  std::unordered_map<std::string, boost::optional<Event>> fast_events;
+  re2::RE2 re_has_param;
   re2::RE2 re_param_to_regex;
   re2::StringPiece sp_param_to_regex;
   re2::RE2::Options options;
 
   Router()
   : filter(new re2::FilteredRE2)
+  , re_has_param("(:[^/]+)")
   , re_param_to_regex("(:([^/]+))")
   , sp_param_to_regex("(?P<\\2>[^/]+)")
   {}
 
+  bool fast(std::string const &route)
+  {
+    return !re2::RE2::PartialMatch(route, re_has_param, (void*)0);
+  }
+
   void add(std::string route, Event block)
   {
+    if(fast(route))
+    {
+      fast_events.insert(std::make_pair(route, block));
+      return;
+    }
+
     re2::RE2::GlobalReplace(&route, re_param_to_regex, sp_param_to_regex);
     filter.reset(new re2::FilteredRE2);
     if(regex_indexes.empty())
@@ -71,6 +86,10 @@ struct Router
   
   boost::optional<std::pair<Event, Params>> match(std::string const &uri)
   {
+    auto event= fast_events[uri];
+    if(event)
+      return std::make_pair(*event, Params());
+
     std::vector<int> matches;
     bool ok= filter-> AllMatches(uri, regex_indexes, &matches);
     if(!ok) return boost::none;
@@ -135,23 +154,27 @@ struct Server
 
     // use router to parse uri and uri parameters
     std::string uri(event-> request_info-> uri);
-    auto pair_block_param= router_ptr-> match(std::string(event-> request_info-> request_method)+ "_"+ uri);
+    std::string request_method(event-> request_info-> request_method);
+    auto pair_block_param= router_ptr-> match(request_method+ "_"+ uri);
     if(!pair_block_param) return 0;
     
-    // read post data
-    char post_data[16* 1024] {}; // 16 kb max post data size
-    int post_data_len= mg_read(event-> conn, post_data, sizeof(post_data));
-
-    std::string str_post_data(post_data, post_data+ post_data_len);
-    std::istringstream parser(str_post_data);
-    std::string key, value;
-    bool ok= false;
-    while(1)
+    if(request_method== "POST" || request_method== "PUT")
     {
-      ok= std::getline(parser, key, '='); if(!ok) break;
-      ok= std::getline(parser, value, '&'); 
-      pair_block_param-> second.insert(std::make_pair(key, value));
-      if(!ok) break;
+      // read post data
+      char post_data[16* 1024] {}; // 16 kb max post data size
+      int post_data_len= mg_read(event-> conn, post_data, sizeof(post_data));
+
+      std::string str_post_data(post_data, post_data+ post_data_len);
+      std::istringstream parser(str_post_data);
+      std::string key, value;
+      bool ok= false;
+      while(1)
+      {
+        ok= std::getline(parser, key, '='); if(!ok) break;
+        ok= std::getline(parser, value, '&'); 
+        pair_block_param-> second.insert(std::make_pair(key, value));
+        if(!ok) break;
+      }
     }
     try
     {

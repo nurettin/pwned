@@ -25,6 +25,9 @@ struct ServerEnv: ::testing::Environment
     });
 
     s= new Server("8080");
+    s-> Get("/", [](mg_event*, Params const &) {
+      return Server::response("called_root");
+    });
     s-> Get("/users", [](mg_event*, Params const &) {
       return Server::response("called_get_users");
     });
@@ -64,6 +67,7 @@ TEST(PwnedServerRouter, RouterMatch)
 
 TEST(PwnedServer, ServerMatch)
 {
+  EXPECT_EQ(open("http://localhost:8080"), "called_root");
   EXPECT_EQ(open("http://localhost:8080/users"), "called_get_users");
   EXPECT_EQ(open("http://localhost:8080/user/1"), "called_get_user_1");
   EXPECT_EQ(open("http://localhost:8080/user/1/post/1"), "called_get_user_1_post_1");

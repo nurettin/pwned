@@ -24,7 +24,7 @@ struct ServerEnv: ::testing::Environment
       return "called_get_user_"+ p.at("id")+ "_post_"+ p.at("post_id");
     });
 
-    s= new Server("8080");
+    s= new Server;
     s-> Get("/", [](mg_event*, Params const &) {
       return Server::response("called_root");
     });
@@ -39,6 +39,9 @@ struct ServerEnv: ::testing::Environment
     });
     s-> Post("/user/create", [](mg_event*, Params const &p) {
       return Server::response("username: "+ p.at("username")+ " password: "+ p.at("password"));
+    });
+    s-> Get("/search", [](mg_event*, Params const &p) {
+      return Server::response("query: "+ p.at("q")+ ", topic: "+ p.at("topic"));
     });
   }
   void TearDown() 
@@ -65,18 +68,38 @@ TEST(PwnedServerRouter, RouterMatch)
   EXPECT_EQ(match-> first(event, match-> second), "called_get_user_11_post_542");
 }
 
-TEST(PwnedServer, ServerMatch)
+TEST(PwnedServer, RouteStatic)
 {
   EXPECT_EQ(open("http://localhost:8080"), "called_root");
+}
+
+TEST(PwnedServer, RouteRest)
+{
   EXPECT_EQ(open("http://localhost:8080/users"), "called_get_users");
   EXPECT_EQ(open("http://localhost:8080/user/1"), "called_get_user_1");
   EXPECT_EQ(open("http://localhost:8080/user/1/post/1"), "called_get_user_1_post_1");
+}
+
+TEST(PwnedServer, RoutePost)
+{
   std::string result;
   post("http://localhost:8080/user/create", result, "username=onur&password=123456");
   EXPECT_EQ(result, "username: onur password: 123456");
 }
 
+TEST(PwnedServer, RouteGet)
+{
+  EXPECT_EQ(open("http://localhost:8080/search?q=C++&topic=C++11"), "query: C++, topic: C++11");
+}
 
+TEST(PwnedServer, Https)
+{
+  auto curl= curl_easy_init();
+  curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
+  std::string result;
+  get("https://localhost:4343/search?q=C++&topic=C++11", result, curl);
+  EXPECT_EQ(result, "query: C++, topic: C++11");
+}
 
 int main(int argc, char **argv) 
 {

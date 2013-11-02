@@ -1,3 +1,4 @@
+#include <ctime>
 #include <string>
 #include <vector>
 #include <sstream>
@@ -42,6 +43,9 @@ struct Router
 
   void add(std::string route, Event block)
   {
+    // remove trailing slash when adding
+    if(route.size()> 1 && route.back()== '/') route.resize(route.size()- 1);
+
     if(fast(route))
     {
       fast_events.insert(std::make_pair(route, block));
@@ -63,7 +67,7 @@ struct Router
     filter-> Compile(&strs);
   }
 
-  boost::optional<Params> extract_uri_params(std::string const &uri, re2::RE2 const &re)
+  boost::optional<Params> rest_params(std::string const &uri, re2::RE2 const &re)
   {
     re2::StringPiece input(uri);
     int group_size = re.NumberOfCapturingGroups();
@@ -84,9 +88,12 @@ struct Router
       result[cgn.second]= ws[cgn.first- 1].ToString();
     return result;
   }
-  
-  boost::optional<std::pair<Event, Params>> match(std::string const &uri)
+
+  boost::optional<std::pair<Event, Params>> match(std::string uri)
   {
+    // remove trailing slash when matching
+    if(uri.size()> 1 && uri.back()== '/') uri.resize(uri.size()- 1);
+
     auto event= fast_events[uri];
     if(event)
       return std::make_pair(*event, Params());
@@ -96,9 +103,9 @@ struct Router
     if(!ok) return boost::none;
     for(int match: matches)
     {
-      auto uri_params= extract_uri_params(uri, *regexes[match]);
-      if(!uri_params) continue;
-      return std::make_pair(events[match], *uri_params);
+      auto uri_rest_params= rest_params(uri, *regexes[match]);
+      if(!uri_rest_params) continue;
+      return std::make_pair(events[match], *uri_rest_params);
     }
     return boost::none;
   }
@@ -177,6 +184,15 @@ struct Server
     return response(buffer, content_type);
   }
 
+  static std::string now()
+  {
+    std::time_t now= std::time(0);
+    std::tm* now_tm= std::localtime(&now);
+    char buf[42];
+    std::strftime(buf, 42, "%Y-%m-%d %X", now_tm);
+    return buf;
+  }
+
   private:
   static int event_handler(mg_event* event)
   {
@@ -185,30 +201,40 @@ struct Server
 
     Router* router_ptr= static_cast<Router*>(event-> user_data);
 
-    // use router to parse uri and uri parameters
     std::string uri(event-> request_info-> uri);
     std::string request_method(event-> request_info-> request_method);
+    //std::printf("%s %s %s\n", now().c_str(), request_method.c_str(), uri.c_str());
+    
+    // use router to parse uri and uri parameters
     auto pair_block_param= router_ptr-> match(request_method+ "_"+ uri);
     if(!pair_block_param) return 0;
     
-    if(request_method== "POST" || request_method== "PUT")
+    std::string data;
+    if(request_method== "GET" && event-> request_info-> query_string!= 0)
+      data= event-> request_info-> query_string;
+    else if(request_method== "POST"|| request_method== "PUT")
     {
       // read post data
-      char post_data[16* 1024] {}; // 16 kb max post data size
+      char post_data[16* 1024] {}; // 16 kb max post data size, because, why not?
       int post_data_len= mg_read(event-> conn, post_data, sizeof(post_data));
+      data.assign(post_data, post_data_len);
+    }
 
-      std::string str_post_data(post_data, post_data+ post_data_len);
-      std::istringstream parser(str_post_data);
+    // parse data if any
+    if(!data.empty())
+    {
+      std::istringstream parser(data);
       std::string key, value;
       bool ok= false;
       while(1)
       {
         ok= std::getline(parser, key, '='); if(!ok) break;
-        ok= std::getline(parser, value, '&'); 
+        ok= std::getline(parser, value, '&');
         pair_block_param-> second.insert(std::make_pair(key, value));
         if(!ok) break;
       }
     }
+
     try
     {
       auto response= pair_block_param-> first(event, pair_block_param-> second);

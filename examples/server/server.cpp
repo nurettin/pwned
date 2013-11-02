@@ -46,6 +46,13 @@ int main()
     return Server::redirect("/");
   });
 
+  server.Get("/search", [](mg_event*, Params const &params) {
+    if(params.count("q"))
+      return Server::response("Searched for: "+ params.at("q"));
+    else
+      return Server::response("Invalid search parameter.");
+  });
+
   std::cin.get();
 }
 

@@ -1,6 +1,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <fstream>
 #include <functional>
 #include <stdexcept>
 #include <memory>
@@ -116,12 +117,23 @@ struct Server
   mg_context* ctx;
   Router router;
 
-  Server(char const* port)
+  Server(char const* listening_ports= "8080,4343s", char const* ssl_certificate= "ssl_cert.pem")
   {
     std::ios_base::sync_with_stdio(false);
-    char const* options[]{ "listening_ports", port, 0 };
-    ctx = mg_start(options, &Server::event_handler, &router);
-    std::cout<< "Started mongoose "<< mg_version()<< " on port "<< port<< std::endl;
+    std::ifstream cert(ssl_certificate);
+    if(cert.is_open())
+    {
+      cert.close();
+      std::cout<< "Found certificate: "<< ssl_certificate<< '\n';
+      char const* options[]{ "listening_ports", listening_ports, "ssl_certificate", ssl_certificate, 0 };
+      ctx = mg_start(options, &Server::event_handler, &router);
+    }
+    else
+    {
+      char const* options[]{ "listening_ports", listening_ports, 0 };
+      ctx = mg_start(options, &Server::event_handler, &router);
+    }
+    std::cout<< "Started pwned backed by mongoose "<< mg_version()<< " on port(s) "<< listening_ports<< std::endl;
   }
 
   ~Server(){ mg_stop(ctx); }
@@ -140,9 +152,29 @@ struct Server
     out<< "HTTP/1.1 "<< status<< "\r\n"
       << "Content-Type: "<< content_type<< "\r\n"
       << "Content-Length: "<< content.size()<< "\r\n"
-      << "Server: pwned_mongoose_"<< mg_version()<< "\r\n\r\n"
+      << "Server: pwned/mongoose"<< mg_version()<< "\r\n\r\n"
       << content;
     return out.str();
+  }
+
+  static std::string redirect(std::string const &uri
+    , std::string const &status= "302 Found")
+  {
+    std::ostringstream out;
+    out<< "HTTP/1.1 "<< status<< "\r\n"
+      << "Location: "<< uri<< "\r\n\r\n";
+    return out.str();
+  }
+
+  static std::string file(std::string const &file_name
+    , std::string const &content_type= "text/html")
+  {
+    std::ifstream file(file_name, std::ios::binary| std::ios::ate);
+    auto size= file.tellg();
+    file.seekg(0, std::ios::beg);
+    std::string buffer(size, 0);
+    file.read(&buffer[0], size);
+    return response(buffer, content_type);
   }
 
   private:

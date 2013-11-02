@@ -16,7 +16,7 @@ Special thanks to [httpbin](https://github.com/kennethreitz/httpbin) for providi
 
 ## pwned::server
 
-Create REST services with ease. 
+Create REST services with ease. A-la sinatra in C++
 
 ## pwned::curl
 

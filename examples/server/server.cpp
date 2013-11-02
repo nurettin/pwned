@@ -6,12 +6,14 @@
 int main()
 {
   using namespace pwned::server;
-  Server server("8080");
+  Server server;
 
   server.Get("/", [](mg_event*, Params const &params) {
     return Server::response(
       "<a href='/add/42/42'>Add 42 + 42</a><br />"
-      "<a href='/form'>Submit a form</a>", "text/html");
+      "<a href='/form'>Submit a form</a><br />"
+      "<a href='/redirect_to_root'>Redirect back to here</a><br />"
+      , "text/html");
   });
 
   server.Get("/add/:first/:second", [](mg_event*, Params const &params){
@@ -28,7 +30,8 @@ int main()
         "<input type='text' name='username' /><br />"
         "<input type='password' name='password' /><br />"
         "<input type='submit' />"
-      "</form>", "text/html");
+      "</form>"
+      , "text/html");
   });
 
   server.Post("/submit", [](mg_event*, Params const &params) {
@@ -36,12 +39,11 @@ int main()
   });
 
   server.Get("/index.html", [](mg_event*, Params const &) {
-    std::ifstream file("index.html", std::ios::binary| std::ios::ate);
-    auto size= file.tellg();
-    file.seekg(0, std::ios::beg);
-    std::string buffer(size, 0);
-    file.read(&buffer[0], size);
-    return Server::response(buffer, "text/html");
+    return Server::file("index.html", "text/html");
+  });
+
+  server.Get("/redirect_to_root", [](mg_event*, Params const &) {
+    return Server::redirect("/");
   });
 
   std::cin.get();

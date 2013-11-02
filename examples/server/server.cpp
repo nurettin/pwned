@@ -12,6 +12,8 @@ int main()
     return Server::response(
       "<a href='/add/42/42'>Add 42 + 42</a><br />"
       "<a href='/form'>Submit a form</a><br />"
+      "<a href='/index.html'>index.html</a><br />"
+      "<a href='/search?q=C++'>Search for C++</a><br />"
       "<a href='/redirect_to_root'>Redirect back to here</a><br />"
       , "text/html");
   });

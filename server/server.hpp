@@ -159,6 +159,7 @@ struct Server
     out<< "HTTP/1.1 "<< status<< "\r\n"
       << "Content-Type: "<< content_type<< "\r\n"
       << "Content-Length: "<< content.size()<< "\r\n"
+      << "Connection: keep-alive\r\n"
       << "Server: pwned/mongoose"<< mg_version()<< "\r\n\r\n"
       << content;
     return out.str();

@@ -29,11 +29,12 @@ void print_loop(std::ostream &o, I b, I e)
     o<< ']';
     return;
   }
-  -- e;
-  for(; b!= e; ++ b)
+  std::size_t size= std::distance(b, e), last= size- 1, i= 0;
+  for(i= 0; i< last; ++ i)
   {
     print(o, *b);
     o<< ", ";
+    ++ b;
   }
   print(o, *b);
   o<< ']';

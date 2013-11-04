@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <forward_list>
 #include <gtest/gtest.h>
 #include "pretty.hpp"
 
@@ -37,6 +38,16 @@ TEST(PwnedPretty, Map)
   std::ostringstream out;
   pwned::pretty::p(m, out);
   EXPECT_EQ(out.str(), "[{\"a\": 42}, {\"b\": 43}]\n");
+}
+
+TEST(PwnedPretty, ForwardList)
+{
+  std::forward_list<int> l;
+  l.insert_after(l.end(), 1);
+  l.insert_after(l.end(), 2);
+  std::ostringstream out;
+  pwned::pretty::p(l, out);
+  EXPECT_EQ(out.str(), "[1, 2]");
 }
 
 TEST(PwnedPretty, MapOfMap)

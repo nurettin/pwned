@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app>
+<html lang="en" ng-app="demoApp">
 <head>
 <title>Angular Test</title>
 </head>
@@ -14,13 +14,16 @@
   </div>
   <script src="scripts/angular.min.js"></script>
   <script>
-    function PeopleController($scope) {
+    var demoApp= angular.module("demoApp", []);
+    var controllers= {};
+    controllers.PeopleController= function($scope) {
       $scope.people= [
         { name: 'nurettin', city: 'ankara' }, 
         { name: 'semseddin', city: 'urfa' }, 
         { name: 'sukreddin', city: 'urfa' }
       ];
-    }
+    };
+    demoApp.controller(controllers);
   </script>
 </body>
 </html>

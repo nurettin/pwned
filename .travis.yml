@@ -7,7 +7,7 @@ before_install:
   - if [ "$CXX" = "g++" ]; then sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y; fi
   - if [ "$CXX" = "clang++" ]; then sudo add-apt-repository ppa:kxstudio-team/builds -y; fi
   - sudo apt-get update -qq
-  - sudo apt-get install -qq libboost-filesystem1.48-dev libboost-system1.48-dev libboost-chrono1.48-dev libboost1.48-dev libgtest-dev libhtmlcxx-dev libcurl4-openssl-dev libjsoncpp-dev libleveldb-dev libsnappy-dev
+  - sudo apt-get install -qq libgflags-dev libboost-filesystem1.48-dev libboost-system1.48-dev libboost-chrono1.48-dev libboost1.48-dev libgtest-dev libhtmlcxx-dev libcurl4-openssl-dev libjsoncpp-dev libleveldb-dev libsnappy-dev
   - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8 --force-yes; fi
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8"; fi
   - if [ "$CXX" = "clang++" ]; then sudo apt-get install -qq clang-3.2 --force-yes; fi

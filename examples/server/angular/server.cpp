@@ -10,16 +10,17 @@ int main(int argc, char* argv[])
   google::ParseCommandLineFlags(&argc, &argv, true);
 
   using namespace pwned::server;
-  Server serve(FLAGS_ports.c_str());
+  Server serve(FLAGS_ports.c_str(), FLAGS_ssl_cert.c_str());
 
   serve.Folder("/public");
+  serve.Folder("/views", false);
 
   serve.Get("/", [](mg_event*, Params const &) {
     return Server::file("public/index.html", "text/html");
   });
 
-  serve.Get("/data", [](mg_event*, Params const &) {
-    return Server::response("{\"name\": \"onur\"}", "application/json");
+  serve.Get("/people", [](mg_event*, Params const &) {
+    return Server::response("[{\"name\": \"onur\", \"city\": \"ankara\"}]", "application/json");
   });
 
   std::cin.get();

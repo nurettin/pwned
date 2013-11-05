@@ -1,0 +1,6 @@
+<h3>People</h3>
+Name:<br />
+<input type="text" ng-model="name" /><br />
+<ul>
+  <li ng-repeat="person in people | filter:name">{{ person.name }} - {{ person.city }}</li>
+</ul>

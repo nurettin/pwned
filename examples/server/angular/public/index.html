@@ -4,23 +4,24 @@
 <title>Angular Test</title>
 </head>
 <body>
-  <div ng-controller="PeopleController">
-    Filter:
-    <br />
-    <input type="text" ng-model="name" />
-    <ul>
-      <li ng-repeat="person in people | filter:name">{{ person.name }} {{ person.city }}</li>
-    </ul>
-  </div>
+  <ng-view></ng-view>
   <script src="scripts/angular.min.js"></script>
   <script>
     var demoApp= angular.module("demoApp", []);
+    demoApp.config(function($routeProvider) {
+      $routeProvider
+      .when("/", {
+        controller: "PeopleController",
+        templateUrl: "views/people.html"
+      })
+      .otherwise({ redirectTo: "/" });
+    });
     var controllers= {};
     controllers.PeopleController= function($scope) {
       $scope.people= [
-        { name: 'nurettin', city: 'ankara' }, 
-        { name: 'semseddin', city: 'urfa' }, 
-        { name: 'sukreddin', city: 'urfa' }
+        { name: "nurettin", city: "ankara" }, 
+        { name: "semseddin", city: "urfa" }, 
+        { name: "sukreddin", city: "urfa" }
       ];
     };
     demoApp.controller(controllers);

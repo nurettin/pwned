@@ -103,6 +103,11 @@ struct Router
       // std::printf("fast match found!\n"); std::fflush(0);
       return std::make_pair(*event, Params());
     }
+    if(regex_indexes.empty())
+    {
+      // std::printf("there are no REST routes\n"); std::fflush(0);
+      return boost::none;
+    }
     std::vector<int> matches;
     bool ok= filter-> AllMatches(uri, regex_indexes, &matches);
     if(!ok) return boost::none;
@@ -157,20 +162,25 @@ struct Server
   void Put(std::string const &uri, pwned::server::Router::Event block){ router.add("PUT_"+ uri, block); }
   void Patch(std::string const &uri, pwned::server::Router::Event block){ router.add("PATCH_"+ uri, block); }
   void Delete(std::string const &uri, pwned::server::Router::Event block){ router.add("DELETE_"+ uri, block); }
-  void Folder(std::string const &folder)
+
+  void Folder(std::string const &folder, bool root= true)
   { 
     using namespace boost::filesystem;
     using namespace boost::algorithm;
     auto current_path= boost::filesystem::current_path();
-    auto current_path_str_size= current_path.string().size()+ folder.size();
+    auto current_path_str_size= current_path.string().size();
+    if(root) current_path_str_size+= folder.size();
     recursive_directory_iterator begin(current_path/ folder), end;
+
     for(; begin!= end; ++ begin)
     {
       auto path= begin-> path();
       if(is_directory(begin-> status())) continue;
       auto path_str= path.string().substr(current_path_str_size);
       auto mime_str= mime(path_str);
-      auto file_str= trim_left_copy_if(folder+ path_str, is_any_of("/"));
+      auto file_path= path_str;
+      if(root) file_path= folder+ path_str;
+      auto file_str= trim_left_copy_if(file_path, is_any_of("/"));
       router.add("GET_"+ path_str, [file_str, mime_str](mg_event*, Params const &) {
         return file(file_str, mime_str);
       });
@@ -216,7 +226,11 @@ struct Server
   static std::string file(std::string const &file_name, std::string const &content_type)
   {
     std::ifstream file(file_name, std::ios::binary| std::ios::ate);
-    if(!file.is_open()) return response("", "", "404 Not Found");
+    if(!file.is_open()) 
+    {
+      // std::printf("file not found: %s\n", file_name.c_str()); std::fflush(0);
+      return response("", "", "404 Not Found");
+    }
     auto size= file.tellg();
     file.seekg(0, std::ios::beg);
     std::string buffer(size, 0);
@@ -248,7 +262,7 @@ struct Server
 
     std::string uri(event-> request_info-> uri);
     std::string request_method(event-> request_info-> request_method);
-    //std::printf("%s %s %s\n", now().c_str(), request_method.c_str(), uri.c_str());
+    // std::printf("%s %s %s\n", now().c_str(), request_method.c_str(), uri.c_str());
 
     // use router to parse uri and uri parameters
     auto pair_block_param= router_ptr-> match(request_method+ "_"+ uri);

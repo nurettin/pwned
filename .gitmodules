@@ -2,10 +2,6 @@
 	path = hcxselect
 	url = git://github.com/jgehring/hcxselect.git
 	ignore = dirty
-[submodule "mongoose"]
-	path = mongoose
-	url = git://github.com/cesanta/mongoose.git
-	ignore = dirty
 [submodule "re2"]
 	path = re2
 	url = git://github.com/nelhage/re2.git

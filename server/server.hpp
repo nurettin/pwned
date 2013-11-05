@@ -9,6 +9,9 @@
 #include <iostream>
 #include <unordered_map>
 #include <boost/optional.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/algorithm/string/trim.hpp>
 #include <re2/filtered_re2.h>
 #include <mongoose.h>
 
@@ -44,8 +47,8 @@ struct Router
   void add(std::string route, Event block)
   {
     // remove trailing slash when adding
-    if(route.size()> 1 && route.back()== '/') route.resize(route.size()- 1);
-
+    if(route.size()> 5 && route.back()== '/') route.resize(route.size()- 1);
+    // std::printf("adding route: %s\n", route.c_str()); std:fflush(0);
     if(fast(route))
     {
       fast_events.insert(std::make_pair(route, block));
@@ -92,12 +95,14 @@ struct Router
   boost::optional<std::pair<Event, Params>> match(std::string uri)
   {
     // remove trailing slash when matching
-    if(uri.size()> 1 && uri.back()== '/') uri.resize(uri.size()- 1);
-
+    if(uri.size()> 5 && uri.back()== '/') uri.resize(uri.size()- 1);
+    // std::printf("matching route: %s\n", uri.c_str()); std::fflush(0);
     auto event= fast_events[uri];
     if(event)
+    {
+      // std::printf("fast match found!\n"); std::fflush(0);
       return std::make_pair(*event, Params());
-
+    }
     std::vector<int> matches;
     bool ok= filter-> AllMatches(uri, regex_indexes, &matches);
     if(!ok) return boost::none;
@@ -105,8 +110,10 @@ struct Router
     {
       auto uri_rest_params= rest_params(uri, *regexes[match]);
       if(!uri_rest_params) continue;
+      // std::printf("parameter match found!\n"); std::fflush(0);
       return std::make_pair(events[match], *uri_rest_params);
     }
+    // std::printf("no match found!\n"); std::fflush(0);
     return boost::none;
   }
 
@@ -150,6 +157,26 @@ struct Server
   void Put(std::string const &uri, pwned::server::Router::Event block){ router.add("PUT_"+ uri, block); }
   void Patch(std::string const &uri, pwned::server::Router::Event block){ router.add("PATCH_"+ uri, block); }
   void Delete(std::string const &uri, pwned::server::Router::Event block){ router.add("DELETE_"+ uri, block); }
+  void Folder(std::string const &folder)
+  { 
+    using namespace boost::filesystem;
+    using namespace boost::algorithm;
+    auto current_path= boost::filesystem::current_path();
+    auto current_path_str_size= current_path.string().size()+ folder.size();
+    recursive_directory_iterator begin(current_path/ folder), end;
+    for(; begin!= end; ++ begin)
+    {
+      auto path= begin-> path();
+      if(is_directory(begin-> status())) continue;
+      auto path_str= path.string().substr(current_path_str_size);
+      auto mime_str= mime(path_str);
+      auto file_str= trim_left_copy_if(folder+ path_str, is_any_of("/"));
+      router.add("GET_"+ path_str, [file_str, mime_str](mg_event*, Params const &) {
+        return file(file_str, mime_str);
+      });
+    }
+  }
+
 
   static std::string response(std::string const &content
     , std::string const &content_type= "text/plain"
@@ -174,15 +201,32 @@ struct Server
     return out.str();
   }
 
-  static std::string file(std::string const &file_name
-    , std::string const &content_type= "text/html")
+  static std::string mime(std::string const &file_name)
+  {
+    using namespace boost::algorithm;
+    if(ends_with(file_name, ".html")|| ends_with(file_name, ".xhtml")|| ends_with(file_name, ".htm"))
+      return "text/html";
+    else if(ends_with(file_name, ".css"))
+      return "text/css";
+    else if(ends_with(file_name, ".js"))
+      return "text/javascript";
+    return "text/plain";
+  }
+
+  static std::string file(std::string const &file_name, std::string const &content_type)
   {
     std::ifstream file(file_name, std::ios::binary| std::ios::ate);
+    if(!file.is_open()) return response("", "", "404 Not Found");
     auto size= file.tellg();
     file.seekg(0, std::ios::beg);
     std::string buffer(size, 0);
     file.read(&buffer[0], size);
     return response(buffer, content_type);
+  }
+
+  static std::string file(std::string const &file_name)
+  {
+    return file(file_name, mime(file_name));
   }
 
   static std::string now()
@@ -205,13 +249,14 @@ struct Server
     std::string uri(event-> request_info-> uri);
     std::string request_method(event-> request_info-> request_method);
     //std::printf("%s %s %s\n", now().c_str(), request_method.c_str(), uri.c_str());
-    
+
     // use router to parse uri and uri parameters
     auto pair_block_param= router_ptr-> match(request_method+ "_"+ uri);
     if(!pair_block_param) return 0;
-    
+
     std::string data;
     if(request_method== "GET" && event-> request_info-> query_string!= 0)
+      // read get data
       data= event-> request_info-> query_string;
     else if(request_method== "POST"|| request_method== "PUT")
     {

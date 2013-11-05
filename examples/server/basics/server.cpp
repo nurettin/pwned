@@ -41,7 +41,7 @@ int main()
   });
 
   server.Get("/index.html", [](mg_event*, Params const &) {
-    return Server::file("index.html", "text/html");
+    return Server::file("index.html");
   });
 
   server.Get("/redirect_to_root", [](mg_event*, Params const &) {

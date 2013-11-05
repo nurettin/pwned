@@ -4,7 +4,7 @@
 	ignore = dirty
 [submodule "mongoose"]
 	path = mongoose
-	url = git://github.com/nurettin/mongoose.git
+	url = git://github.com/cesanta/mongoose.git
 	ignore = dirty
 [submodule "re2"]
 	path = re2

@@ -17,6 +17,11 @@
 
 namespace pwned { namespace server {
 
+enum class FolderType
+{
+  ROOT, NESTED
+};
+
 typedef std::map<std::string, std::string> Params;
 
 struct Router
@@ -48,7 +53,7 @@ struct Router
   {
     // remove trailing slash when adding
     if(route.size()> 5 && route.back()== '/') route.resize(route.size()- 1);
-    // std::printf("adding route: %s\n", route.c_str()); std:fflush(0);
+    // std::printf("adding route: %s\n", route.c_str()); std::fflush(0);
     if(fast(route))
     {
       fast_events.insert(std::make_pair(route, block));
@@ -152,6 +157,8 @@ struct Server
       char const* options[]{ "listening_ports", listening_ports, 0 };
       ctx = mg_start(options, &Server::event_handler, &router);
     }
+    if(!ctx)
+      throw std::runtime_error("Error starting mongoose!");
     std::cout<< "Started pwned backed by mongoose "<< mg_version()<< " on port(s) "<< listening_ports<< std::endl;
   }
 
@@ -163,13 +170,13 @@ struct Server
   void Patch(std::string const &uri, pwned::server::Router::Event block){ router.add("PATCH_"+ uri, block); }
   void Delete(std::string const &uri, pwned::server::Router::Event block){ router.add("DELETE_"+ uri, block); }
 
-  void Folder(std::string const &folder, bool root= true)
+  void Folder(std::string const &folder, FolderType folder_type= FolderType::NESTED)
   { 
     using namespace boost::filesystem;
     using namespace boost::algorithm;
     auto current_path= boost::filesystem::current_path();
     auto current_path_str_size= current_path.string().size();
-    if(root) current_path_str_size+= folder.size();
+    if(folder_type== FolderType::ROOT) current_path_str_size+= folder.size();
     recursive_directory_iterator begin(current_path/ folder), end;
 
     for(; begin!= end; ++ begin)
@@ -179,14 +186,14 @@ struct Server
       auto path_str= path.string().substr(current_path_str_size);
       auto mime_str= mime(path_str);
       auto file_path= path_str;
-      if(root) file_path= folder+ path_str;
+      if(folder_type== FolderType::ROOT) file_path= folder+ path_str;
       auto file_str= trim_left_copy_if(file_path, is_any_of("/"));
+      // std::printf("Adding folder: %s\n", file_str.c_str()); std::fflush(0);
       router.add("GET_"+ path_str, [file_str, mime_str](mg_event*, Params const &) {
         return file(file_str, mime_str);
       });
     }
   }
-
 
   static std::string response(std::string const &content
     , std::string const &content_type= "text/plain"

@@ -12,8 +12,8 @@ int main(int argc, char* argv[])
   using namespace pwned::server;
   Server serve(FLAGS_ports.c_str(), FLAGS_ssl_cert.c_str());
 
-  serve.Folder("/public");
-  serve.Folder("/views", false);
+  serve.Folder("/public", FolderType::ROOT);
+  serve.Folder("/views");
 
   serve.Get("/", [](mg_event*, Params const &) {
     return Server::file("public/index.html", "text/html");

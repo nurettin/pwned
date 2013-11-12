@@ -14,6 +14,7 @@ int main()
       "<a href='/form'>Submit a form</a><br />"
       "<a href='/index.html'>index.html</a><br />"
       "<a href='/search?q=C++'>Search for C++</a><br />"
+      "<a href='/zipped'>Test Gzip</a><br />"
       "<a href='/redirect_to_root'>Redirect back to here</a><br />"
       , "text/html");
   });
@@ -52,6 +53,11 @@ int main()
     return Server::response("Searched for: "+ params["q"]);
   });
 
+  server.Get("/zipped", [](mg_event*, Params const &) {
+    std::string data= "This was zipped by the server";
+    for(int n= 5; n-- ; data+= data);
+    return Server::response_gzip(data); 
+  });
   std::cin.get();
 }
 

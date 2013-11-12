@@ -12,6 +12,9 @@
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <boost/iostreams/filtering_streambuf.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/filter/zlib.hpp>
 #include <re2/filtered_re2.h>
 #include <mongoose.h>
 
@@ -158,7 +161,7 @@ struct Server
       ctx = mg_start(options, &Server::event_handler, &router);
     }
     if(!ctx)
-      throw std::runtime_error("Error starting mongoose!");
+      throw std::runtime_error("Error starting server");
     std::cout<< "Started pwned backed by mongoose "<< mg_version()<< " on port(s) "<< listening_ports<< std::endl;
   }
 
@@ -207,6 +210,32 @@ struct Server
       << "Server: pwned/mongoose"<< mg_version()<< "\r\n\r\n"
       << content;
     return out.str();
+  }
+
+  static std::string compress(std::string const &data)
+  {
+    using namespace boost::iostreams;
+    filtering_streambuf<input> in;
+    in.push(zlib_compressor());
+    in.push(boost::make_iterator_range(data));
+    std::ostringstream out;
+    copy(in, out);
+    return out.str();
+  }
+
+  static std::string response_gzip(std::string const &content
+    , std::string const &content_type= "text/plain"
+    , std::string const &status= "200 OK")
+  {
+    std::string compressed= compress(content);
+    std::ostringstream cat;
+    cat<< "HTTP/1.1 "<< status<< "\r\n"
+      << "Content-Encoding: deflate\r\n"
+      << "Transfer-Encoding: chunked\r\n"
+      << "Connection: keep-alive\r\n"
+      << "Server: pwned/mongoose"<< mg_version()<< "\r\n\r\n"
+      << std::hex<< compressed.size()<< "\r\n"<< compressed<< "\r\n0\r\n\r\n";
+    return cat.str();
   }
 
   static std::string redirect(std::string const &uri

@@ -3,18 +3,20 @@
 #include <vector>
 #include <sstream>
 #include <fstream>
+#include <iomanip>
 #include <functional>
 #include <stdexcept>
 #include <memory>
 #include <iostream>
 #include <unordered_map>
+#include <zlib.h>
 #include <boost/optional.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/iostreams/filtering_streambuf.hpp>
 #include <boost/iostreams/copy.hpp>
-#include <boost/iostreams/filter/zlib.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
 #include <re2/filtered_re2.h>
 #include <mongoose.h>
 
@@ -216,10 +218,41 @@ struct Server
   {
     using namespace boost::iostreams;
     filtering_streambuf<input> in;
-    in.push(zlib_compressor());
+    in.push(gzip_compressor());
     in.push(boost::make_iterator_range(data));
     std::ostringstream out;
     copy(in, out);
+    return out.str();
+  }
+
+  static std::string compress2(std::string const &data)
+  {
+    int outlen= ::compressBound(data.size())+ 18;
+    std::vector<char> out(outlen);
+    z_stream s {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    s.next_in = (Bytef*)data.c_str();
+    s.avail_in = data.size();
+    int res = deflateInit2(&s, Z_DEFAULT_COMPRESSION, Z_DEFLATED, (15+ 16), 8, Z_DEFAULT_STRATEGY);
+    if (res!= Z_OK) return "";
+    do {
+      s.next_out = (Bytef*)(&out[0]) + s.total_out;
+      s.avail_out = outlen - s.total_out;
+      res = deflate(&s, Z_FINISH);
+    } while ( res == Z_OK );
+    deflateEnd(&s);
+    return std::string(out.begin(), out.begin()+ s.total_out);
+  }
+
+  static std::string hex(std::string const &data)
+  {
+    std::ostringstream out;
+    auto begin= data.cbegin();
+    auto end= data.cend();
+    out<< std::hex<< std::setfill('0')<< std::setw(2)<< static_cast<unsigned>(static_cast<unsigned char>(*begin));
+    ++ begin;
+    if(begin== end) return out.str();
+    for(; begin!= end; ++ begin)
+      out<< ' '<< std::setw(2)<< static_cast<unsigned>(static_cast<unsigned char>(*begin));
     return out.str();
   }
 
@@ -230,11 +263,12 @@ struct Server
     std::string compressed= compress(content);
     std::ostringstream cat;
     cat<< "HTTP/1.1 "<< status<< "\r\n"
-      << "Content-Encoding: deflate\r\n"
-      << "Transfer-Encoding: chunked\r\n"
       << "Connection: keep-alive\r\n"
-      << "Server: pwned/mongoose"<< mg_version()<< "\r\n\r\n"
-      << std::hex<< compressed.size()<< "\r\n"<< compressed<< "\r\n0\r\n\r\n";
+      << "Content-Encoding: gzip\r\n"
+      << "Content-Length: "<< compressed.size()<<"\r\n"
+      << "Content-Type: "<< content_type<< "\r\n"
+      << "Server: pwned/mongoose"<< mg_version()<< "\r\n\r\n";
+    cat.write(&compressed[0], compressed.size());
     return cat.str();
   }
 
@@ -334,7 +368,7 @@ struct Server
     try
     {
       auto response= pair_block_param-> first(event, pair_block_param-> second);
-      mg_printf(event-> conn, "%s", response.c_str());
+      mg_write(event-> conn, &response[0], response.size());
     } catch(std::exception &ex)
     {
       std::cerr<< "Error: "<< ex.what()<< '\n';

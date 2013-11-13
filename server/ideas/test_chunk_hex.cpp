@@ -3,5 +3,5 @@
 
 int main()
 {
-  std::cout<< std::hex<< 4242<< '\n';
+  std::cout<< std::hex<< 42424242<< '\n';
 }

@@ -42,12 +42,10 @@ TEST(PwnedPretty, Map)
 
 TEST(PwnedPretty, ForwardList)
 {
-  std::forward_list<int> l;
-  l.insert_after(l.end(), 1);
-  l.insert_after(l.end(), 2);
+  std::forward_list<int> l{ 1, 2 };
   std::ostringstream out;
   pwned::pretty::p(l, out);
-  EXPECT_EQ(out.str(), "[1, 2]");
+  EXPECT_EQ(out.str(), "[1, 2]\n");
 }
 
 TEST(PwnedPretty, MapOfMap)

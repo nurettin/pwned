@@ -11,8 +11,6 @@
 
 namespace pwned { namespace curl {
 
-typedef std::map<std::string, std::string> Params;
-
 void check(CURLcode code)
 {
   if(code!= CURLE_OK)
@@ -36,17 +34,6 @@ void set_output_container(CURL* c, containerT &s)
   check(curl_easy_setopt(c, CURLOPT_WRITEDATA, &s));
   std::size_t(*f)(void*, std::size_t, std::size_t, void*)= output_to_container<containerT>;
   check(curl_easy_setopt(c, CURLOPT_WRITEFUNCTION, f));
-}
-
-std::string params_to_string(Params const &params)
-{
-  std::string data;
-  Params::const_iterator pb= params.begin(), pe= params.end();
-  -- pe;
-  for(; pb!= pe; ++ pb)
-    data+= pb-> first+ "="+ pb-> second+ "&";
-  data+= pb-> first+ "="+ pb-> second;
-  return data;
 }
 
 template <typename containerT>

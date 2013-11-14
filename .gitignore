@@ -1,4 +1,5 @@
 *.out
 *.gc*
 re2/obj/
-
+*.base
+*.run

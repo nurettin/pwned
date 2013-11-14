@@ -27,7 +27,7 @@ enum class FolderType
   ROOT, NESTED
 };
 
-typedef std::map<std::string, std::string> Params;
+typedef std::unordered_map<std::string, std::string> Params;
 
 struct Router
 {
@@ -96,7 +96,7 @@ struct Router
     bool ok= re2::RE2::FullMatchN(input, re, &args[0], group_size);
     if(!ok)
       return boost::none;
-    std::map<std::string, std::string> result;
+    Params result;
     for(auto &cgn: re.CapturingGroupNames())
       result[cgn.second]= ws[cgn.first- 1].ToString();
     return result;

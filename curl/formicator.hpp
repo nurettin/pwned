@@ -11,6 +11,8 @@ namespace pwned{ namespace curl {
 
 struct Formicator
 {
+  typedef std::map<std::string, std::string> Params;
+
   CURL* curl;
   htmlcxx::HTML::ParserDom parser;
   std::string domain;
@@ -76,6 +78,16 @@ struct Formicator
     return *selection.begin();
   }
 
+  static std::string params_to_string(Params const &params)
+  {
+    std::string data;
+    Params::const_iterator pb= params.begin(), pe= params.end();
+    -- pe;
+    for(; pb!= pe; ++ pb)
+      data+= pb-> first+ "="+ pb-> second+ "&";
+    data+= pb-> first+ "="+ pb-> second;
+    return data;
+  }
 };
 
 } } // pwned curl

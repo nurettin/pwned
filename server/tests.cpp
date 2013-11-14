@@ -43,6 +43,9 @@ struct ServerEnv: ::testing::Environment
     s-> Get("/search", [](mg_event*, Params const &p) {
       return Server::response("query: "+ p.at("q")+ ", topic: "+ p.at("topic"));
     });
+    s-> Get("/zip", [](mg_event*, Params const &) {
+      return Server::response_gzip("hi this is dog");
+    });
   }
   void TearDown() 
   { 
@@ -99,6 +102,15 @@ TEST(PwnedServer, Https)
   std::string result;
   get("https://localhost:4343/search?q=C++&topic=C++11", result, curl);
   EXPECT_EQ(result, "query: C++, topic: C++11");
+}
+
+TEST(PwnedServer, Gzip)
+{
+  auto curl= curl_easy_init();
+  curl_easy_setopt(curl, CURLOPT_ACCEPT_ENCODING, "gzip");
+  std::string result;
+  get("http://localhost:8080/zip", result, curl);
+  EXPECT_EQ(result, "hi this is dog");
 }
 
 int main(int argc, char **argv) 

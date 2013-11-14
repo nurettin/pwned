@@ -307,10 +307,30 @@ struct Server
     file.read(&buffer[0], size);
     return response(buffer, content_type);
   }
-
+  
   static std::string file(std::string const &file_name)
   {
     return file(file_name, mime(file_name));
+  }
+
+  static std::string file_gzip(std::string const &file_name, std::string const &content_type)
+  {
+    std::ifstream file(file_name, std::ios::binary| std::ios::ate);
+    if(!file.is_open()) 
+    {
+      // std::printf("file not found: %s\n", file_name.c_str()); std::fflush(0);
+      return response("", "", "404 Not Found");
+    }
+    auto size= file.tellg();
+    file.seekg(0, std::ios::beg);
+    std::string buffer(size, 0);
+    file.read(&buffer[0], size);
+    return response_gzip(compress(buffer), content_type);
+  }
+
+  static std::string file_gzip(std::string const &file_name)
+  {
+    return file_gzip(file_name, mime(file_name));
   }
 
   static std::string now()

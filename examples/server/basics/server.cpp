@@ -54,8 +54,9 @@ int main()
   });
 
   server.Get("/zipped", [](mg_event*, Params const &) {
-    return Server::response_gzip("hi this is a test"); 
+    return Server::response_gzip("hi this is a dog"); 
   });
+
   std::cin.get();
 }
 

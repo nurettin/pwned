@@ -98,7 +98,8 @@ TEST(PwnedServer, Get)
 TEST(PwnedServer, Https)
 {
   auto curl= curl_easy_init();
-  curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
+  curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0); 
+  curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0); 
   std::string result;
   get("https://localhost:4343/search?q=C++&topic=C++11", result, curl);
   EXPECT_EQ(result, "query: C++, topic: C++11");

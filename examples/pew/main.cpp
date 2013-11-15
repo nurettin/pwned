@@ -15,3 +15,11 @@ int main()
   pew.run(15);
 }
 
+/* outputs:
+
+Tests repeated: 15 times, averages:
+1. boost iostreams  674ms 93.07%
+2. raw zlib stream  725ms 100.00%
+
+*/
+

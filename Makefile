@@ -12,6 +12,7 @@ run_tests:
 	cd progress && $(MAKE) && cd .. && \
 	cd parameters && $(MAKE) && cd .. && \
 	cd re2 && $(MAKE) -s -j 4 && cd .. && \
-	cd server && $(MAKE) && cd ..
+	cd server && $(MAKE) && cd .. && \
+	cd pew && $(MAKE) && cd ..
 	@printf "test LOC:" && wc -l */tests.cpp | grep total
 	@printf "code LOC:" && wc -l */*.hpp | grep total

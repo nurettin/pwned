@@ -6,7 +6,7 @@
 
 This library provides simple C++(11) interfaces to common programming tasks.
 
-Dependencies: boost-filesystem boost-system boost curl jsoncpp leveldb pthread gtest htmlcxx hcxselect
+Dependencies: boost-filesystem boost-system boost-iostreams boost curl jsoncpp leveldb pthread gtest htmlcxx hcxselect
 Special thanks to [httpbin](https://github.com/kennethreitz/httpbin) for providing a way to test Formicator. 
 
 ### Features:
@@ -18,13 +18,25 @@ Special thanks to [httpbin](https://github.com/kennethreitz/httpbin) for providi
 
 Create REST services with ease. A-la sinatra in C++
 
+## pwned::curl::Formicator
+
+Scrape the web with Formicator in your favorite language. Formication and delicious cookies!
+
+## pwned::leveldb
+
+Simple leveldb interface. Supports reverse iteration between two values!
+
 ## pwned::curl
 
 Download URIs into C++ sequence containers, fill forms and post!
 
-## pwned::curl::Formicator
+## pwned::pew
 
-Scrape the web with Formicator in your favorite language. Formication and delicious cookies!
+Benchmarking functions just got easier. With OpenMP support!
+
+## pwned::pretty
+
+Output C++ containers to streams. Supports adding print functions for new types.
 
 ## pwned::view
 
@@ -33,14 +45,6 @@ Map, reduce, select from C++ containers and iterator ranges. Low copy overhead a
 ## pwned::jsoncpp
 
 Simple jsoncpp interface
-
-## pwned::leveldb
-
-Simple leveldb interface. Supports reverse iteration between two values!
-
-## pwned::pretty
-
-Output C++ containers to streams. Supports adding print functions for new types.
 
 ## pwned::parameters
 

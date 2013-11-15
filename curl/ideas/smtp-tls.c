@@ -2,7 +2,7 @@
 #include <string.h>
 #include <curl/curl.h>
 
-#define FROM    "<onurtugcu@gmail.com>"
+#define FROM    "<zopsmtp@gmail.com>"
 #define TO      "<onurtugcu@gmail.com>"
 #define CC      "<onurtugcu@gmail.com>"
 
@@ -20,17 +20,6 @@ static const char* payload_text[]={
   "Check RFC5322.\n",
   NULL
 };
-
-std::string smtp_header(
-  std::string const &to
-, std::string const &from
-, std::vector<std::string> const &cc
-, std::string const &subject
-, std::string const &body)
-{
-  std::ostringstream out;
-  return out.str();
-}
 
 struct upload_status {
   int lines_read;

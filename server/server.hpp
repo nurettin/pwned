@@ -225,24 +225,6 @@ struct Server
     return out.str();
   }
 
-  static std::string compress2(std::string const &data)
-  {
-    int outlen= ::compressBound(data.size())+ 18;
-    std::vector<char> out(outlen);
-    z_stream s {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    s.next_in = (Bytef*)data.c_str();
-    s.avail_in = data.size();
-    int res = deflateInit2(&s, Z_DEFAULT_COMPRESSION, Z_DEFLATED, (15+ 16), 8, Z_DEFAULT_STRATEGY);
-    if (res!= Z_OK) return "";
-    do {
-      s.next_out = (Bytef*)(&out[0]) + s.total_out;
-      s.avail_out = outlen - s.total_out;
-      res = deflate(&s, Z_FINISH);
-    } while ( res == Z_OK );
-    deflateEnd(&s);
-    return std::string(out.begin(), out.begin()+ s.total_out);
-  }
-
   static std::string hex(std::string const &data)
   {
     std::ostringstream out;

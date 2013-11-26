@@ -62,6 +62,46 @@ struct DB
     check_status(db-> Delete(write_options, k));
   }
 
+  //! Call block on all leveldb documents
+  void all(std::function<void(std::string const &, std::string const &)> f)
+  {
+    std::unique_ptr< ::leveldb::Iterator> it(db-> NewIterator(read_options));
+    for(it-> SeekToFirst(); it-> Valid(); it-> Next())
+    {
+      ::leveldb::Slice const &key= it-> key();
+      f(key.ToString(), it-> value().ToString());
+    }
+    check_status(it-> status());
+  }
+
+  //! Call block on leveldb documents starting from key
+  void from(::leveldb::Slice const &begin
+    , std::function<void(std::string const &, std::string const &)> f)
+  {
+    std::unique_ptr< ::leveldb::Iterator> it(db-> NewIterator(read_options));
+    for(it-> Seek(begin); it-> Valid(); it-> Next())
+    {
+      ::leveldb::Slice const &key= it-> key();
+      f(key.ToString(), it-> value().ToString());
+    }
+    check_status(it-> status());
+  }
+
+  //! Call block on leveldb documents until key is reached
+  void until(::leveldb::Slice const &end
+    , std::function<void(std::string const &, std::string const &)> f)
+  {
+    std::unique_ptr< ::leveldb::Iterator> it(db-> NewIterator(read_options));
+    for(it-> SeekToFirst(); it-> Valid(); it-> Next())
+    {
+      ::leveldb::Slice const &key= it-> key();
+      if(options.comparator-> Compare(key, end)> 0)
+        break;
+      f(key.ToString(), it-> value().ToString());
+    }
+    check_status(it-> status());
+  }
+
   //! Call block on leveldb range of keys
   void each(::leveldb::Slice const &begin
     , ::leveldb::Slice const &end

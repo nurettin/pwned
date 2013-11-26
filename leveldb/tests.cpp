@@ -95,6 +95,36 @@ TEST(PwnedLeveldb, Batch)
   LeveldbEnv::db-> remove("20130913114900");
 }
 
+TEST(PwnedLeveldb, From)
+{
+  LeveldbEnv::db-> put("20130913114800", "abc");
+  LeveldbEnv::db-> put("20130913114805", "def");
+  LeveldbEnv::db-> put("20130913114900", "wtf");
+  std::vector<std::string> data;
+  LeveldbEnv::db-> from("20130913114805", [&](std::string const &, std::string const &v){
+    data.push_back(v);
+  });
+  EXPECT_EQ(data, (std::vector<std::string>{ "def", "wtf" }));
+  LeveldbEnv::db-> remove("20130913114800");
+  LeveldbEnv::db-> remove("20130913114805");
+  LeveldbEnv::db-> remove("20130913114900");
+}
+
+TEST(PwnedLeveldb, Until)
+{
+  LeveldbEnv::db-> put("20130913114800", "abc");
+  LeveldbEnv::db-> put("20130913114805", "def");
+  LeveldbEnv::db-> put("20130913114900", "wtf");
+  std::vector<std::string> data;
+  LeveldbEnv::db-> until("20130913114805", [&](std::string const &, std::string const &v){
+    data.push_back(v);
+  });
+  EXPECT_EQ(data, (std::vector<std::string>{ "abc", "def" }));
+  LeveldbEnv::db-> remove("20130913114800");
+  LeveldbEnv::db-> remove("20130913114805");
+  LeveldbEnv::db-> remove("20130913114900");
+}
+
 int main(int argc, char **argv) 
 {
   ::testing::InitGoogleTest(&argc, argv);

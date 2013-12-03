@@ -26,6 +26,10 @@ Scrape the web with Formicator in your favorite language. Formication and delici
 
 Simple leveldb interface. Supports reverse iteration between two values!
 
+## pwned::active_proto
+
+Turns protobuf objects into SQLite mappings. Lets you persist and query protobuf objects in SQLite.
+
 ## pwned::curl
 
 Download URIs into C++ sequence containers, fill forms and post!

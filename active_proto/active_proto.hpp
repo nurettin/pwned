@@ -115,9 +115,8 @@ struct Active
       cat<< f0-> name()<< "= '"<< ref-> GetString(newer, f0)<< "'";
     else if(f0-> type()== google::protobuf::FieldDescriptor::TYPE_DOUBLE)
       cat<< f0-> name()<< "= "<< ref-> GetDouble(newer, f0);
-    std::deque<decltype(dirty_fields)::value_type> dq_dirty_fields(dirty_fields.begin(), dirty_fields.end());
-    dq_dirty_fields.pop_back();
-    for(auto &f: dq_dirty_fields)
+    std::vector<decltype(dirty_fields)::value_type>(dirty_fields.begin()+ 1, dirty_fields.end()).swap(dirty_fields);
+    for(auto &f: dirty_fields)
       if(f-> type()== google::protobuf::FieldDescriptor::TYPE_INT32)
         cat<< ", "<< f-> name()<< "= "<< ref-> GetInt32(newer, f);
       else if(f-> type()== google::protobuf::FieldDescriptor::TYPE_STRING)
@@ -142,28 +141,6 @@ struct Active
         break;
     }
     return "";
-  }
-
-  std::vector<google::protobuf::FieldDescriptor const*> 
-  dirty(google::protobuf::Message const &mold, google::protobuf::Message const &mnew, google::protobuf::Reflection const* r)
-  {
-    std::vector<google::protobuf::FieldDescriptor const*> fields, dirty;
-    r-> ListFields(mold, &fields);
-    for(auto &fp: fields)
-      if(fp-> type()== google::protobuf::FieldDescriptor::TYPE_INT32 && r-> GetInt32(mold, fp)!= r-> GetInt32(mnew, fp))
-        dirty.push_back(fp);
-      else if(fp-> type()== google::protobuf::FieldDescriptor::TYPE_STRING && r-> GetString(mold, fp)!= r-> GetString(mnew, fp))
-        dirty.push_back(fp);
-      else if(fp-> type()== google::protobuf::FieldDescriptor::TYPE_DOUBLE && r-> GetDouble(mold, fp)!= r-> GetDouble(mnew, fp))
-        dirty.push_back(fp);
-    return dirty;
-  }
-
-  std::vector<google::protobuf::FieldDescriptor const*> 
-  dirty(google::protobuf::Message const &mold, google::protobuf::Message const &mnew)
-  {
-    auto r= mold.GetReflection();
-    return dirty(mold, mnew, r);
   }
 
   void execute_sql(std::string const &sql)
@@ -206,12 +183,25 @@ struct Active
     }
     else
     {
-      std::string sql= update_sql(dirty(older, newer, ref));
-      if(sql.empty()) return;
+      std::vector<google::protobuf::FieldDescriptor const*> dirty;
+      for(int f= 0; f< desc-> field_count(); ++ f)
+      {
+        auto fp= desc-> field(f);
+        if(fp-> type()== google::protobuf::FieldDescriptor::TYPE_MESSAGE)
+          continue;
 
+        if(fp-> type()== google::protobuf::FieldDescriptor::TYPE_INT32 && ref-> GetInt32(older, fp)!= ref-> GetInt32(newer, fp))
+          dirty.push_back(fp);
+        else if(fp-> type()== google::protobuf::FieldDescriptor::TYPE_STRING && ref-> GetString(older, fp)!= ref-> GetString(newer, fp))
+          dirty.push_back(fp);
+        else if(fp-> type()== google::protobuf::FieldDescriptor::TYPE_DOUBLE && ref-> GetDouble(older, fp)!= ref-> GetDouble(newer, fp))
+          dirty.push_back(fp);
+      }
+      std::string sql= update_sql(dirty);
+      if(sql.empty()) return;
       sqlite3_stmt* stmt;
       sqlite3_prepare_v2(db, sql.c_str(), sql.size(), &stmt, 0);
-      sqlite3_bind_int(stmt, 1, newer.id());
+      sqlite3_bind_int(stmt, 1, ref-> GetInt32(newer, desc-> field(0)));
       sqlite3_step(stmt); 
     }
     older= newer;
@@ -228,20 +218,31 @@ struct Active
     for(int f= 0; f< desc-> field_count(); ++ f)
     {
       auto fp= desc-> field(f);
+      if(fp-> type()== google::protobuf::FieldDescriptor::TYPE_MESSAGE)
+        continue;
+
       if(fp-> type()== google::protobuf::FieldDescriptor::TYPE_INT32)
+      {
         ref-> SetInt32(&newer, fp, sqlite3_column_int(stmt, f));
+        ref-> SetInt32(&older, fp, sqlite3_column_int(stmt, f));
+      }
       else if(fp-> type()== google::protobuf::FieldDescriptor::TYPE_STRING)
       {
         unsigned char const* text= sqlite3_column_text(stmt, f);
         std::string text_str;
         if(text!= 0) text_str= reinterpret_cast<char const*>(text);
         ref-> SetString(&newer, fp, text_str);
+        ref-> SetString(&older, fp, text_str);
       }
       else if(fp-> type()== google::protobuf::FieldDescriptor::TYPE_DOUBLE)
+      {
         ref-> SetDouble(&newer, fp, sqlite3_column_double(stmt, f));
+        ref-> SetDouble(&older, fp, sqlite3_column_double(stmt, f));
+      }
     }
+    newer.set_id(newer.id());
+    older.set_id(older.id());
     sqlite3_finalize(stmt);
-    older= newer;
   }
 
   std::vector<T> all()
@@ -256,6 +257,9 @@ struct Active
       for(int f= 0; f< desc-> field_count(); ++ f)
       {
         auto fp= desc-> field(f);
+        if(fp-> type()== google::protobuf::FieldDescriptor::TYPE_MESSAGE)
+          continue;
+
         if(fp-> type()== google::protobuf::FieldDescriptor::TYPE_INT32)
           ref-> SetInt32(&row, fp, sqlite3_column_int(stmt, f));
         else if(fp-> type()== google::protobuf::FieldDescriptor::TYPE_STRING)
@@ -288,7 +292,7 @@ struct Active
     std::string sql= "delete from "+ desc-> name()+ " where id= ?1;";
     sqlite3_stmt* stmt;
     sqlite3_prepare_v2(db, sql.c_str(), sql.size(), &stmt, 0);
-    sqlite3_bind_int(stmt, 1, newer.id());
+    sqlite3_bind_int(stmt, 1, ref-> GetInt32(newer, desc-> field(0)));
     sqlite3_step(stmt);
   }
   

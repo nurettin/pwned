@@ -4,7 +4,7 @@ all: run_tests
 
 run_tests:
 	@cd pretty && $(MAKE) && cd .. && \
-	cd hcxselect && $(MAKE) -s -j 4 && cd .. && \
+	cd hcxselect && $(MAKE) -s && cd .. && \
 	cd curl && $(MAKE) && cd .. && \
 	cd leveldb && $(MAKE) && cd .. && \
 	cd jsoncpp && $(MAKE) && cd .. && \

@@ -301,6 +301,36 @@ struct Active
     std::string sql= "delete from "+ desc-> name()+ ";";
     execute_sql(sql);
   }
+
+  std::string make_fk_name(std::string const &model_name)
+  {
+    auto fk_name= model_name;
+    fk_name[0]= std::tolower(fk_name[0]);
+    fk_name+= "_id";
+    return fk_name;
+  }
+
+  template <typename T2>
+  T2 get<T2>()
+  {
+    T2 t2;
+    auto t2_desc= t2.GetDescriptor();
+    auto t2_ref= t2.GetReflection();
+    auto t2_name= t2_desc-> name();
+    auto fk_name= make_fk_name(t2_name);
+    std::cout<< "foreign key name: "<< fk_name<< '\n';
+    auto fk_field= desc-> FindFieldByName(fk_name);
+    int fk_id= ref-> GetInt32(newer, fk_field);
+    std::string sql= "select * from "+ t2_name+ " where id= ?1;";
+    sqlite3_stmt* stmt;
+    sqlite3_prepare_v2(db, sql.c_str(), sql.size(), &stmt, 0);
+    sqlite3_bind_int(stmt, 1, fk_id);
+
+    T2 row;
+    std::vector<T2> rows;
+    sqlite3_finalize(stmt);
+    return row;
+  }
 };
 
 template <typename T>

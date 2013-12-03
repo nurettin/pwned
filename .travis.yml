@@ -1,9 +1,9 @@
 language: cpp
 compiler:
-#  - clang
+  #- clang
   - gcc
 before_install:
-  - sudo pip install cpp-coveralls --use-mirrors
+  #- sudo pip install cpp-coveralls --use-mirrors
   - sudo add-apt-repository ppa:fcitx-team/nightly -y
   - if [ "$CXX" = "g++" ]; then sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y; fi
   - if [ "$CXX" = "clang++" ]; then sudo add-apt-repository ppa:kxstudio-team/builds -y; fi
@@ -20,4 +20,4 @@ before_install:
   - cd -
   - git submodule update --init --recursive
 script: make
-after_success: coveralls
+#after_success: coveralls

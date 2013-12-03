@@ -1,7 +1,7 @@
 # pwned
 
 [![Build Status](https://travis-ci.org/nurettin/pwned.png?branch=master)](https://travis-ci.org/nurettin/pwned)
-[![Coverage Status](https://coveralls.io/repos/nurettin/pwned/badge.png)](https://coveralls.io/r/nurettin/pwned)
+<!--[![Coverage Status](https://coveralls.io/repos/nurettin/pwned/badge.png)](https://coveralls.io/r/nurettin/pwned)*/-->
 [![Maintenance](http://stillmaintained.com/nurettin/pwned.png)](http://stillmaintained.com/nurettin/pwned)
 
 This library provides simple C++(11) interfaces to common programming tasks.

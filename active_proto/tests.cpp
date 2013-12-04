@@ -56,7 +56,13 @@ TEST(PwnedActiveProto, DeleteAll)
   person1.delete_all();
   EXPECT_EQ(person1.count(), 0);
 }
-
+/*
+TEST(PwnedActiveProto, Foreign)
+{
+  Active<Person> person;
+  person.get<Product>();
+}
+*/
 int main(int argc, char **argv) 
 {
   ::testing::InitGoogleTest(&argc, argv);

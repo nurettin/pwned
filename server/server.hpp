@@ -202,14 +202,17 @@ struct Server
 
   static std::string response(std::string const &content
     , std::string const &content_type= "text/plain"
-    , std::string const &status= "200 OK")
+    , std::string const &status= "200 OK"
+    , std::string const &cookie= "")
   {
     std::ostringstream out;
     out<< "HTTP/1.1 "<< status<< "\r\n"
       << "Content-Type: "<< content_type<< "\r\n"
       << "Content-Length: "<< content.size()<< "\r\n"
-      << "Connection: keep-alive\r\n"
-      << "Server: pwned/mongoose"<< mg_version()<< "\r\n\r\n"
+      << "Connection: keep-alive\r\n";
+    if(!cookie.empty())
+      out<< "Set-Cookie: "<< cookie<< ";max-age=315569260\r\n";
+    out<< "Server: pwned/mongoose"<< mg_version()<< "\r\n\r\n"
       << content;
     return out.str();
   }
@@ -275,19 +278,24 @@ struct Server
     return "text/plain";
   }
 
-  static std::string file(std::string const &file_name, std::string const &content_type)
+  static std::string file_data(std::string const &file_name)
   {
     std::ifstream file(file_name, std::ios::binary| std::ios::ate);
     if(!file.is_open()) 
     {
       // std::printf("file not found: %s\n", file_name.c_str()); std::fflush(0);
-      return response("", "", "404 Not Found");
+      return "";
     }
     auto size= file.tellg();
     file.seekg(0, std::ios::beg);
     std::string buffer(size, 0);
     file.read(&buffer[0], size);
-    return response(buffer, content_type);
+    return buffer;
+  }
+
+  static std::string file(std::string const &file_name, std::string const &content_type)
+  {
+    return response(file_data(file_name), content_type);
   }
   
   static std::string file(std::string const &file_name)
@@ -297,17 +305,7 @@ struct Server
 
   static std::string file_gzip(std::string const &file_name, std::string const &content_type)
   {
-    std::ifstream file(file_name, std::ios::binary| std::ios::ate);
-    if(!file.is_open()) 
-    {
-      // std::printf("file not found: %s\n", file_name.c_str()); std::fflush(0);
-      return response("", "", "404 Not Found");
-    }
-    auto size= file.tellg();
-    file.seekg(0, std::ios::beg);
-    std::string buffer(size, 0);
-    file.read(&buffer[0], size);
-    return response_gzip(compress(buffer), content_type);
+    return response_gzip(compress(file_data(file_name)), content_type);
   }
 
   static std::string file_gzip(std::string const &file_name)

@@ -207,7 +207,7 @@ struct Server
   {
     std::ostringstream out;
     out<< "HTTP/1.1 "<< status<< "\r\n"
-      << "Content-Type: "<< content_type<< "\r\n"
+      << "Content-Type: "<< content_type<< "; charset=utf-8\r\n"
       << "Content-Length: "<< content.size()<< "\r\n"
       << "Connection: keep-alive\r\n";
     if(!cookie.empty())
@@ -251,7 +251,7 @@ struct Server
       << "Connection: keep-alive\r\n"
       << "Content-Encoding: gzip\r\n"
       << "Content-Length: "<< compressed.size()<<"\r\n"
-      << "Content-Type: "<< content_type<< "\r\n"
+      << "Content-Type: "<< content_type<< "; charset=utf-8\r\n"
       << "Server: pwned/mongoose"<< mg_version()<< "\r\n\r\n";
     cat.write(&compressed[0], compressed.size());
     return cat.str();

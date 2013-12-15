@@ -275,6 +275,10 @@ struct Server
       return "text/css";
     else if(ends_with(file_name, ".js"))
       return "text/javascript";
+    else if(ends_with(file_name, ".json"))
+      return "text/json";
+    else if(ends_with(file_name, ".jsonp"))
+      return "text/jsonp";
     return "text/plain";
   }
 

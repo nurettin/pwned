@@ -1,6 +1,9 @@
-.PHONY: all run_tests
+.PHONY: all update run_tests
 
-all: run_tests
+all: update run_tests
+
+update:
+	git submodule update --init --recursive
 
 run_tests:
 	@cd pretty && $(MAKE) && cd .. && \

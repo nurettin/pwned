@@ -9,7 +9,6 @@
 #include <memory>
 #include <iostream>
 #include <unordered_map>
-#include <zlib.h>
 #include <boost/optional.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string/predicate.hpp>

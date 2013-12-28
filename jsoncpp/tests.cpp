@@ -13,6 +13,14 @@ TEST(PwnedJson, Error)
   EXPECT_THROW(pwned::jsoncpp::Json("{\"x\": x}"), std::runtime_error);
 }
 
+TEST(PwnedJson, Operator)
+{
+  pwned::jsoncpp::Json json;
+  json["test"][0]["a"]= 1;
+  json["test"][1]["b"]= 2;
+  EXPECT_EQ(json.string(), "{\"test\":[{\"a\":1},{\"b\":2}]}\n");
+}
+
 int main(int argc, char **argv) 
 {
   ::testing::InitGoogleTest(&argc, argv);

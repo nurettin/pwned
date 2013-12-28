@@ -31,6 +31,12 @@ struct Json
     if(!ok)
       throw std::runtime_error(reader.getFormattedErrorMessages());
   }
+
+  template <typename T>
+  ::Json::Value &operator[](T const &t)
+  {
+    return root[t];
+  }
 };
 
 } }

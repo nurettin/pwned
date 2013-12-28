@@ -13,6 +13,8 @@ struct Json
   ::Json::Reader reader;
   ::Json::FastWriter writer;
 
+  Json(){}
+
   Json(std::string const &json)
   {
     operator= (json);

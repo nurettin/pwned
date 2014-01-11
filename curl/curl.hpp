@@ -65,6 +65,15 @@ CURL* get(std::string const &url, containerT &c, CURL* curl= curl_easy_init(), b
 }
 
 template <typename containerT>
+CURL* delete_(std::string const &url, containerT &c, CURL* curl= curl_easy_init(), bool session= false)
+{
+  return perform(url, c, curl, session, [&](){
+    check(curl_easy_setopt(curl, CURLOPT_HEADER, 0)); 
+    check(curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE"));
+  });
+}
+
+template <typename containerT>
 CURL* post(std::string const &url, containerT &c, char const* params_string, CURL* curl= curl_easy_init(), bool session= false)
 {
   return perform(url, c, curl, session, [&](){

@@ -18,6 +18,10 @@ Special thanks to [httpbin](https://github.com/kennethreitz/httpbin) for providi
 
 Create REST services with ease. A-la sinatra in C++
 
+## pwned::ecto1
+
+phantomjs ghostdriver C++ bindings. run `phantomjs --webdriver=someport`
+
 ## pwned::curl::Formicator
 
 Scrape the web with Formicator in your favorite language. Formication and delicious cookies!

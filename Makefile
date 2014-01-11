@@ -21,3 +21,4 @@ run_tests:
 	cd ecto1 && $(MAKE) && cd ..
 	@printf "test LOC:" && wc -l */tests.cpp | grep total
 	@printf "code LOC:" && wc -l */*.hpp | grep total
+

@@ -1,7 +1,11 @@
+#ifndef ECTO1_HPP
+#define ECTO1_HPP
+
 #include <pwned/curl/curl.hpp>
 #include <pwned/jsoncpp/jsoncpp.hpp>
 #include <iostream>
-#include <fstream>
+
+namespace pwned { namespace ecto1 {
 
 struct Ecto1
 {
@@ -14,6 +18,7 @@ struct Ecto1
   {
     std::string ret;
     pwned::jsoncpp::Json req;
+    //There is a bug when using MSIE user agent https://github.com/ariya/phantomjs/issues/11827
     req["desiredCapabilities"]["phantomjs.page.settings.userAgent"]= "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0";
     pwned::curl::post(phantom_url+ "/session", ret, req.string().c_str());
     //TODO: submit bug report because post result doesn't have any session info
@@ -46,7 +51,6 @@ struct Ecto1
     pwned::jsoncpp::Json res(ret);
     if(res["status"].asInt()!= 0)
       throw std::runtime_error("Error getting element id: "+ ret);
-    std::cout<< ret<< '\n';
     return res["value"]["ELEMENT"].asString();
   }
   
@@ -108,14 +112,20 @@ struct Ecto1
     if(res["status"].asInt()!= 0)
       throw std::runtime_error("Error switching to iframe: "+ ret);
   }
-/*
-  void screenshot()
+
+  std::string screenshot()
   {
     pwned::jsoncpp::Json ret(pwned::curl::open(session_url+ "/screenshot"));
-    std::ofstream file("shot.html");
-    file<< "<img src=\"data:image/png;base64,"+ ret["value"].asString()+ "\" />";
+    if(ret["status"].asInt()!= 0)
+      throw std::runtime_error("Error taking screenshot: "+ ret.string());
+    return ret["value"].asString();
   }
-*/
+
+  std::string screenshot_mime()
+  {
+    return "data:image/png;base64,"+ screenshot();
+  }
+
   ~Ecto1()
   {
     std::string ret;
@@ -126,86 +136,7 @@ struct Ecto1
   }
 };
 
-struct Is
-{
-  Ecto1 driver;
+} }
 
-  Is()
-  : driver("http://localhost:4242")
-  {}
-
-  void login(std::string const &password)
-  {
-    std::cout<< "session id: "<< driver.session_id<< '\n';
-    driver.get("https://www.isbank.com.tr/Internet/");
-    std::cout<< "typing username\n";
-    driver.set_value_by_name("_ctl0:MusNoText", std::getenv("IS_USERNAME"));
-    std::cout<< "typing password\n";
-    driver.set_value_by_name("ParolaText", std::getenv("IS_PASSWORD"));
-    std::cout<< "clicking submit\n";
-    driver.click_by_name("_ctl0:SubeLogin01_btnGiris");
-    std::cout<< "entering password2\n";
-    driver.set_value_by_name("CepIAnahtarSifreText", std::getenv("IS_PASSWORD2"));
-    std::cout<< "entering generated password\n";
-    driver.set_value_by_name("_ctl0:Z6_IGA:TxtSoftOtp", password);
-    std::cout<< "clicking submit\n";
-    driver.click_by_name("_ctl0:Z6_IGA:SubeLogin02_CepAnahtarBtnGiris");
-  }
-
-  void try_login(std::string const &password)
-  {
-    try {
-      login(password);
-    } catch(std::exception &ex) {
-      std::cerr<< "Error logging in: "<< ex.what()<< '\n';
-      std::cerr<< "Trying again...\n";
-      login(password);
-    }
-  }
-
-  void home()
-  {
-    std::cout<< "top frame\n";
-    driver.top_frame();
-    std::cout<< "clicking home page\n";
-    driver.click_by_id("Internet_lblGiris");
-  }
-  
-  void buy_stock(std::string const &name)
-  {
-    try {
-    home();
-    std::cout<< "clicking yatirim\n";
-    driver.click_by_id("LinkId_menu_MM_YATIRIM_03_");
-    std::cout<< "clicking hisse senedi\n";
-    driver.click_by_id("LinkId_menu_SM_HISSE_SENEDI_03_01_");
-    std::cout<< "clicking alis\n";
-    driver.click_by_id("LinkId_menu_GA00_03_01_01_");
-    std::cout<< "frame 1\n";
-    driver.frame(1);
-    std::cout<< "entering stock name\n";
-    driver.set_value_by_name("_ctl0:SmartSearchControl:SmartSearchControl_SmartSearchTextbox", name);
-    } catch(std::exception &ex) {
-    std::cerr<< "error clicking something: "<< ex.what()<< '\n';
-    }
-    driver.screenshot();
-  }
-
-  void quit()
-  {
-    driver.top_frame();
-    driver.click_by_id("Internet_lblSLogout");
-  }
-};
-
-int main()
-{
-  Is is;
-  std::cout<< "Generated password: ";
-  std::string generated_password;
-  std::getline(std::cin, generated_password);
-  is.try_login(generated_password);
-  is.buy_stock("ADESE");
-  is.quit();
-}
+#endif
 

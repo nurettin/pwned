@@ -20,7 +20,10 @@ Create REST services with ease. A-la sinatra in C++
 
 ## pwned::ecto1
 
+![](http://static.fjcdn.com/pictures/Pimped_bccf14_1303121.jpg)
+
 phantomjs ghostdriver C++ bindings. run `phantomjs --webdriver=someport`
+You can theoretically use this to run selenium tests, too. Or maybe a headless firefox on xfb. The cruelty.
 
 ## pwned::curl::Formicator
 

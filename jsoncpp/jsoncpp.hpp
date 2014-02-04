@@ -13,6 +13,8 @@ struct Json
   ::Json::Reader reader;
   mutable ::Json::FastWriter writer;
 
+  Json(){}
+
   Json(std::string const &json)
   {
     operator= (json);
@@ -28,6 +30,12 @@ struct Json
     bool ok= reader.parse(json, root);
     if(!ok)
       throw std::runtime_error(reader.getFormattedErrorMessages());
+  }
+
+  template <typename T>
+  ::Json::Value &operator[](T const &t)
+  {
+    return root[t];
   }
 };
 

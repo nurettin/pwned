@@ -1,0 +1,14 @@
+message Product {
+  required int32 id= 1;
+  required int32 person_id= 2;
+  required Person person= 3;
+}
+
+message Person {
+  required int32 id= 1;
+  optional string name= 2;
+  optional string email= 3;
+
+  repeated Product products= 4;
+}
+

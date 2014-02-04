@@ -9,7 +9,6 @@
 #include <memory>
 #include <iostream>
 #include <unordered_map>
-#include <zlib.h>
 #include <boost/optional.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string/predicate.hpp>
@@ -202,14 +201,17 @@ struct Server
 
   static std::string response(std::string const &content
     , std::string const &content_type= "text/plain"
-    , std::string const &status= "200 OK")
+    , std::string const &status= "200 OK"
+    , std::string const &cookie= "")
   {
     std::ostringstream out;
     out<< "HTTP/1.1 "<< status<< "\r\n"
-      << "Content-Type: "<< content_type<< "\r\n"
+      << "Content-Type: "<< content_type<< "; charset=utf-8\r\n"
       << "Content-Length: "<< content.size()<< "\r\n"
-      << "Connection: keep-alive\r\n"
-      << "Server: pwned/mongoose"<< mg_version()<< "\r\n\r\n"
+      << "Connection: keep-alive\r\n";
+    if(!cookie.empty())
+      out<< "Set-Cookie: "<< cookie<< ";max-age=315569260\r\n";
+    out<< "Server: pwned/mongoose"<< mg_version()<< "\r\n\r\n"
       << content;
     return out.str();
   }
@@ -248,7 +250,7 @@ struct Server
       << "Connection: keep-alive\r\n"
       << "Content-Encoding: gzip\r\n"
       << "Content-Length: "<< compressed.size()<<"\r\n"
-      << "Content-Type: "<< content_type<< "\r\n"
+      << "Content-Type: "<< content_type<< "; charset=utf-8\r\n"
       << "Server: pwned/mongoose"<< mg_version()<< "\r\n\r\n";
     cat.write(&compressed[0], compressed.size());
     return cat.str();
@@ -272,22 +274,31 @@ struct Server
       return "text/css";
     else if(ends_with(file_name, ".js"))
       return "text/javascript";
+    else if(ends_with(file_name, ".json"))
+      return "text/json";
+    else if(ends_with(file_name, ".jsonp"))
+      return "text/jsonp";
     return "text/plain";
   }
 
-  static std::string file(std::string const &file_name, std::string const &content_type)
+  static std::string file_data(std::string const &file_name)
   {
     std::ifstream file(file_name, std::ios::binary| std::ios::ate);
     if(!file.is_open()) 
     {
       // std::printf("file not found: %s\n", file_name.c_str()); std::fflush(0);
-      return response("", "", "404 Not Found");
+      return "";
     }
     auto size= file.tellg();
     file.seekg(0, std::ios::beg);
     std::string buffer(size, 0);
     file.read(&buffer[0], size);
-    return response(buffer, content_type);
+    return buffer;
+  }
+
+  static std::string file(std::string const &file_name, std::string const &content_type)
+  {
+    return response(file_data(file_name), content_type);
   }
   
   static std::string file(std::string const &file_name)
@@ -297,17 +308,7 @@ struct Server
 
   static std::string file_gzip(std::string const &file_name, std::string const &content_type)
   {
-    std::ifstream file(file_name, std::ios::binary| std::ios::ate);
-    if(!file.is_open()) 
-    {
-      // std::printf("file not found: %s\n", file_name.c_str()); std::fflush(0);
-      return response("", "", "404 Not Found");
-    }
-    auto size= file.tellg();
-    file.seekg(0, std::ios::beg);
-    std::string buffer(size, 0);
-    file.read(&buffer[0], size);
-    return response_gzip(compress(buffer), content_type);
+    return response_gzip(compress(file_data(file_name)), content_type);
   }
 
   static std::string file_gzip(std::string const &file_name)

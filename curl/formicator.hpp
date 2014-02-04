@@ -66,6 +66,13 @@ struct Formicator
     });
   }
 
+  void delete_(std::string const &url)
+  {
+    perform([&](){
+      pwned::curl::delete_(domain+ "/"+ url, page, curl, true);
+    });
+  }
+
   hcxselect::Selection select(std::string const &css)
   {
     return selector.select(css);

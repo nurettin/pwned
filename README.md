@@ -1,7 +1,7 @@
 # pwned
 
 [![Build Status](https://travis-ci.org/nurettin/pwned.png?branch=master)](https://travis-ci.org/nurettin/pwned)
-[![Coverage Status](https://coveralls.io/repos/nurettin/pwned/badge.png)](https://coveralls.io/r/nurettin/pwned)
+<!--[![Coverage Status](https://coveralls.io/repos/nurettin/pwned/badge.png)](https://coveralls.io/r/nurettin/pwned)*/-->
 [![Maintenance](http://stillmaintained.com/nurettin/pwned.png)](http://stillmaintained.com/nurettin/pwned)
 
 This library provides simple C++(11) interfaces to common programming tasks.
@@ -18,6 +18,13 @@ Special thanks to [httpbin](https://github.com/kennethreitz/httpbin) for providi
 
 Create REST services with ease. A-la sinatra in C++
 
+## pwned::ecto1
+
+![](http://static.fjcdn.com/pictures/Pimped_bccf14_1303121.jpg)
+
+phantomjs ghostdriver C++ bindings. run `phantomjs --webdriver=someport`
+You can theoretically use this to run selenium tests, too. Or maybe a headless firefox on xfb. The cruelty.
+
 ## pwned::curl::Formicator
 
 Scrape the web with Formicator in your favorite language. Formication and delicious cookies!
@@ -25,6 +32,10 @@ Scrape the web with Formicator in your favorite language. Formication and delici
 ## pwned::leveldb
 
 Simple leveldb interface. Supports reverse iteration between two values!
+
+## pwned::active_proto
+
+Turns protobuf objects into SQLite mappings. Lets you persist and query protobuf objects in SQLite.
 
 ## pwned::curl
 

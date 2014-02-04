@@ -71,6 +71,12 @@ TEST(PwnedCurlFormicator, Find)
   EXPECT_EQ(h1-> first_child-> data.text(), "Herman Melville - Moby-Dick");
 }
 
+TEST(PwnedCurlFormicator, Delete)
+{
+  CurlEnv::f-> delete_("/delete?data=42");
+  EXPECT_EQ(boost::algorithm::contains(CurlEnv::f-> page, "data=42"), true);
+}
+
 int main(int argc, char **argv) 
 {
   ::testing::InitGoogleTest(&argc, argv);

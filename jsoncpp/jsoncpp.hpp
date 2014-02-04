@@ -11,14 +11,14 @@ struct Json
 {
   ::Json::Value root;
   ::Json::Reader reader;
-  ::Json::FastWriter writer;
+  mutable ::Json::FastWriter writer;
 
   Json(std::string const &json)
   {
     operator= (json);
   }
 
-  std::string string()
+  std::string string() const
   {
     return writer.write(root);	
   }

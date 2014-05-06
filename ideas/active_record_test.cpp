@@ -48,10 +48,17 @@ struct FieldBase
     std::string skip;
     bool ok= std::getline(parse, skip, '<') && 
       std::getline(parse, type, ',') &&
-      parse.ignore(1) &&
-      std::getline(parse, table, ':') &&
-      parse.ignore(1) &&
-      std::getline(parse, column, '>');
+      parse.ignore(1);
+    std::string token;
+    // parse scopes
+    std::getline(parse, token, ':') && parse.ignore(1);
+    table+= token; 
+    while(std::getline(parse, token, ':') && parse.ignore(1))
+      table+= "_"+ token;
+    column= token;
+    // parse column name
+    if(!column.empty())
+      column.erase(std::prev(column.end()));
     if(!ok)
       throw std::runtime_error("Invalid type: "+ type_name+ " must be Field<type, Record::field>");
   }
@@ -70,7 +77,7 @@ namespace ActiveRecord {
       {
         if(f-> dirty)
         {
-          std::cout<< pwned::type::name(*f)<< ", dirty: "<< std::boolalpha<< f-> dirty<< std::endl;
+          std::cout<< f-> type<< " / "<< f-> table<< " / "<< f-> column<< ", dirty: "<< std::boolalpha<< f-> dirty<< std::endl;
           f-> persist();
         }
       }
@@ -110,22 +117,21 @@ struct Field: FieldBase
 };
 
 #define attr_accessible(type, name) \
-  enum name{}; Field<type, name> name
+  enum name{}; Field<type, name> name= *this;
+
+namespace wtf{ 
 
 struct User: ActiveRecord::Base
 {
-  User()
-  : login(*this)
-  , password(*this)
-  {}
-
-  attr_accessible(std::string, login);
-  attr_accessible(std::string, password);
+  attr_accessible(std::string, login)
+  attr_accessible(std::string, password)
 };
+
+}
 
 int main()
 {
-  User u;
+  wtf::User u;
   u.login= "admin";
   std::cout<< u.login()<< std::endl;
   u.save();

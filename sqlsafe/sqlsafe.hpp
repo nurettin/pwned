@@ -6,6 +6,7 @@
 #include <memory>
 #include <functional>
 #include <sqlite3.h>
+#include <boost/log/trivial.hpp>
 #include <boost/fusion/adapted/std_tuple.hpp>
 #include <boost/fusion/algorithm/iteration/for_each.hpp>
 
@@ -57,6 +58,11 @@ std::unique_ptr<T, F> gc(T* ptr, F fun)
   return std::unique_ptr<T, F>(ptr, fun);
 }
 
+void trace(void*, char const* str)
+{
+  BOOST_LOG_TRIVIAL(trace)<< str;
+}
+
 std::unique_ptr<sqlite3, std::function<void(sqlite3*)>>
 make_db(std::string const &file, int flags= SQLITE_OPEN_READWRITE| SQLITE_OPEN_CREATE| SQLITE_OPEN_FULLMUTEX| SQLITE_OPEN_WAL)
 {
@@ -64,6 +70,7 @@ make_db(std::string const &file, int flags= SQLITE_OPEN_READWRITE| SQLITE_OPEN_C
   ensure(p_db, sqlite3_open_v2(file.c_str(), &p_db, flags, 0));
   std::function<void(sqlite3*)> fun= [](sqlite3* db){ check(db, sqlite3_close_v2(db)); };
   auto db= gc(p_db, fun);
+  sqlite3_trace(p_db, &trace, 0);
   return db;
 }
 

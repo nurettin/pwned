@@ -9,7 +9,6 @@ struct SqlSafeEnv: ::testing::Environment
 
   void SetUp() 
   { 
-    boost::log::core::get()-> set_logging_enabled(false);
     SqlSafeEnv::db= make_db(":memory:"); 
     execute(SqlSafeEnv::db, "create table wtf(id text)");
   }

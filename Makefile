@@ -6,7 +6,8 @@ update:
 	git submodule update --init --recursive
 
 run_tests:
-	@cd pretty && $(MAKE) && cd .. && \
+	@cd sqlsafe && $(MAKE) && cd .. && \
+	cd pretty && $(MAKE) && cd .. && \
 	cd hcxselect && $(MAKE) -s && cd .. && \
 	cd curl && $(MAKE) && cd .. && \
 	cd leveldb && $(MAKE) && cd .. && \

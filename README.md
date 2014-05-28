@@ -4,7 +4,7 @@
 <!--[![Coverage Status](https://coveralls.io/repos/nurettin/pwned/badge.png)](https://coveralls.io/r/nurettin/pwned)*/-->
 [![Maintenance](http://stillmaintained.com/nurettin/pwned.png)](http://stillmaintained.com/nurettin/pwned)
 
-This library provides simple C++(11) interfaces to common programming tasks.
+This library provides simple C++ interfaces to common programming tasks.
 
 Dependencies: boost-filesystem boost-system boost-iostreams boost curl jsoncpp leveldb pthread gtest htmlcxx hcxselect
 Special thanks to [httpbin](https://github.com/kennethreitz/httpbin) for providing a way to test Formicator. 
@@ -32,6 +32,10 @@ Scrape the web with Formicator in your favorite language. Formication and delici
 ## pwned::leveldb
 
 Simple leveldb interface. Supports reverse iteration between two values!
+
+## pwned::sqlsafe
+
+type-safe, exception-safe, thin C++ wrapper for sqlite3.
 
 ## pwned::active_proto
 

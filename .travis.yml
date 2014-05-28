@@ -9,7 +9,7 @@ before_install:
   - if [ "$CXX" = "clang++" ]; then sudo add-apt-repository ppa:kxstudio-team/builds -y; fi
   - sudo add-apt-repository ppa:boost-latest/ppa -y
   - sudo apt-get update -qq
-  - sudo apt-get install -qq phantomjs cmake g++-4.8 libgflags-dev libboost-log1.55-dev libboost-iostreams1.55-dev libboost-filesystem1.55-dev libboost-system1.55-dev libboost-chrono1.55-dev libboost1.55-dev libgtest-dev libhtmlcxx-dev libcurl4-openssl-dev libjsoncpp-dev libleveldb-dev libsnappy-dev libprotobuf-dev protobuf-compiler
+  - sudo apt-get install -qq phantomjs cmake g++-4.8 libsqlite3-dev libgflags-dev libboost-log1.55-dev libboost-iostreams1.55-dev libboost-filesystem1.55-dev libboost-system1.55-dev libboost-chrono1.55-dev libboost1.55-dev libgtest-dev libhtmlcxx-dev libcurl4-openssl-dev libjsoncpp-dev libleveldb-dev libsnappy-dev libprotobuf-dev protobuf-compiler
   - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq ggcov g++-4.8 --force-yes; export CXX="g++-4.8"; fi
   - if [ "$CXX" = "clang++" ]; then sudo apt-get install -qq clang-3.2 --force-yes; fi
   - sudo mkdir /usr/src/gtest/build

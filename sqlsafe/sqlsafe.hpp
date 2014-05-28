@@ -68,7 +68,7 @@ make_db(std::string const &file, int flags= SQLITE_OPEN_READWRITE| SQLITE_OPEN_C
 {
   sqlite3* p_db= 0;
   ensure(p_db, sqlite3_open_v2(file.c_str(), &p_db, flags, 0));
-  std::function<void(sqlite3*)> fun= [](sqlite3* db){ check(db, sqlite3_close_v2(db)); };
+  std::function<void(sqlite3*)> fun= [](sqlite3* db){ check(db, sqlite3_close(db)); };
   auto db= gc(p_db, fun);
   sqlite3_trace(p_db, &trace, 0);
   return db;

@@ -28,9 +28,10 @@ bool check(sqlite3* db, int code)
     return true;
   if(code== SQLITE_DONE)
     return false;
+  std::string err;
   {
     scoped_mutex mutex(db);
-    std::string err(sqlite3_errmsg(db));
+    err= sqlite3_errmsg(db);
   }
   if(code== SQLITE_MISUSE)
     err+= " SQLite misuse detected";

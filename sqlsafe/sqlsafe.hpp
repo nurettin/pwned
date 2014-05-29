@@ -15,15 +15,23 @@ namespace pwned{ namespace sqlsafe{
 typedef std::unique_ptr<sqlite3, std::function<void(sqlite3*)>> db_type;
 typedef std::unique_ptr<sqlite3_stmt, std::function<void(sqlite3_stmt*)>> stmt_type;
 
+struct scoped_mutex
+{
+  sqlite3* db;
+  scoped_mutex(sqlite3* db): db(db){ sqlite3_mutex_enter(sqlite3_db_mutex(m)); }
+  ~scoped_mutex(){ sqlite3_mutex_leave(sqlite3_db_mutex(m)); }
+};
+
 bool check(sqlite3* db, int code)
 {
   if(code== SQLITE_ROW|| code== SQLITE_OK) 
     return true;
   if(code== SQLITE_DONE)
     return false;
-  sqlite3_mutex_enter(sqlite3_db_mutex(db));
-  std::string err(sqlite3_errmsg(db));
-  sqlite3_mutex_leave(sqlite3_db_mutex(db));
+  {
+    scoped_mutex mutex(db);
+    std::string err(sqlite3_errmsg(db));
+  }
   if(code== SQLITE_MISUSE)
     err+= " SQLite misuse detected";
   BOOST_LOG_TRIVIAL(error)<< "SQLite Error: "+ err;
@@ -39,9 +47,11 @@ void ensure(sqlite3* db, int code)
 {
   if(code== SQLITE_ROW|| code== SQLITE_DONE|| code== SQLITE_OK) 
     return;
-  sqlite3_mutex_enter(sqlite3_db_mutex(db));
-  std::string err(sqlite3_errmsg(db));
-  sqlite3_mutex_leave(sqlite3_db_mutex(db));
+  std::string err;
+  {
+    scoped_mutex mutex(db);
+    err= sqlite3_errmsg(db);
+  }
   if(code== SQLITE_MISUSE)
     err+= " SQLite misuse detected";
   throw std::runtime_error("SQLite Error: "+ err);

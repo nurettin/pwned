@@ -107,6 +107,7 @@ struct stmt_set
 
   template <typename T>
   void operator()(T const &) const;
+
 };
 
 template <>
@@ -127,6 +128,13 @@ template <>
 void stmt_set::operator()<std::string>(std::string const &t) const
 {
   ensure(db, sqlite3_bind_text(stmt.get(), index, t.c_str(), t.size(), SQLITE_STATIC));
+  ++ index;
+}
+
+template <>
+void stmt_set::operator()<char const*>(char const* const &t) const
+{
+  ensure(db, sqlite3_bind_text(stmt.get(), index, t, std::strlen(t), SQLITE_STATIC));
   ++ index;
 }
 

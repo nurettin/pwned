@@ -133,7 +133,7 @@ void stmt_set::operator()<std::string>(std::string const &t) const
 template <typename... T>
 void set(db_type const &db, stmt_type const &stmt, T&&... t)
 {
-  boost::fusion::for_each(std::forward_as_tuple<T>(t)..., stmt_set(db, stmt));
+  boost::fusion::for_each(std::make_tuple(t...), stmt_set(db, stmt));
 }
 
 void reset(db_type const &db, stmt_type const &stmt)

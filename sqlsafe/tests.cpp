@@ -11,7 +11,7 @@ struct SqlSafeEnv: ::testing::Environment
   {
     boost::log::core::get()-> set_logging_enabled(false);
     SqlSafeEnv::db= make_db(":memory:"); 
-    execute(SqlSafeEnv::db, "create table wtf(id text)");
+    execute(SqlSafeEnv::db, "create table wtf(id int, name text)");
   }
   void TearDown() {}
 };
@@ -20,9 +20,9 @@ db_type SqlSafeEnv::db;
 
 TEST(PwnedSqlSafe, WriteScoped)
 {
-  auto insert= make_stmt(SqlSafeEnv::db, "insert into wtf(id) values(?)");
+  auto insert= make_stmt(SqlSafeEnv::db, "insert into wtf(id, name) values(?, ?)");
   for(int id= 1; id< 100; id+= 10)
-    ASSERT_NO_THROW( execute(SqlSafeEnv::db, insert, std::to_string(id)) );
+    ASSERT_NO_THROW( execute(SqlSafeEnv::db, insert, id, std::to_string(id)) );
 }
 
 TEST(PwnedLeveldb, Read)

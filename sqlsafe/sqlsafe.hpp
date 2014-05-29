@@ -18,8 +18,8 @@ typedef std::unique_ptr<sqlite3_stmt, std::function<void(sqlite3_stmt*)>> stmt_t
 struct scoped_mutex
 {
   sqlite3* db;
-  scoped_mutex(sqlite3* db): db(db){ sqlite3_mutex_enter(sqlite3_db_mutex(m)); }
-  ~scoped_mutex(){ sqlite3_mutex_leave(sqlite3_db_mutex(m)); }
+  scoped_mutex(sqlite3* db): db(db){ sqlite3_mutex_enter(sqlite3_db_mutex(db)); }
+  ~scoped_mutex(){ sqlite3_mutex_leave(sqlite3_db_mutex(db)); }
 };
 
 bool check(sqlite3* db, int code)

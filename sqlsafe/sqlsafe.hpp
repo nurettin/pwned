@@ -1,6 +1,7 @@
 #ifndef PWNED_SQLSAFE_HPP
 #define PWNED_SQLSAFE_HPP
 
+#include <cstring>
 #include <string>
 #include <stdexcept>
 #include <memory>

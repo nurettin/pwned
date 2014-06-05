@@ -112,14 +112,35 @@ struct stmt_set
 };
 
 template <>
-void stmt_set::operator()<int>(int const &t) const
+void stmt_set::operator()<int32_t>(int32_t const &t) const
 {
   ensure(db, sqlite3_bind_int(stmt.get(), index, t));
   ++ index;
 }
 
 template <>
+void stmt_set::operator()<int64_t>(int64_t const &t) const
+{
+  ensure(db, sqlite3_bind_int64(stmt.get(), index, t));
+  ++ index;
+}
+
+template <>
+void stmt_set::operator()<uint64_t>(uint64_t const &t) const
+{
+  ensure(db, sqlite3_bind_int64(stmt.get(), index, t));
+  ++ index;
+}
+
+template <>
 void stmt_set::operator()<double>(double const &t) const
+{
+  ensure(db, sqlite3_bind_double(stmt.get(), index, t));
+  ++ index;
+}
+
+template <>
+void stmt_set::operator()<long double>(long double const &t) const
 {
   ensure(db, sqlite3_bind_double(stmt.get(), index, t));
   ++ index;
@@ -156,7 +177,7 @@ struct scoped_setter
   db_type const &db;
   stmt_type const &stmt;
 
-  scoped_setter(db_type const &db, stmt_type const &stmt, T&... tuple)
+  scoped_setter(db_type const &db, stmt_type const &stmt, T const &... tuple)
   : db(db)
   , stmt(stmt)
   {
@@ -203,7 +224,14 @@ struct stmt_get
 };
   
 template <>
-void stmt_get::operator()<int>(int &t) const
+void stmt_get::operator()<int32_t>(int32_t &t) const
+{
+  t= sqlite3_column_int(stmt.get(), index);
+  ++ index;
+}
+
+template <>
+void stmt_get::operator()<int64_t>(int64_t &t) const
 {
   t= sqlite3_column_int(stmt.get(), index);
   ++ index;
@@ -211,6 +239,13 @@ void stmt_get::operator()<int>(int &t) const
 
 template <>
 void stmt_get::operator()<double>(double &t) const
+{
+  t= sqlite3_column_double(stmt.get(), index);
+  ++ index;
+}
+
+template <>
+void stmt_get::operator()<long double>(long double &t) const
 {
   t= sqlite3_column_double(stmt.get(), index);
   ++ index;

@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include "candle_stream.hpp"
 
-namespace enterprice{
+namespace pwned{ namespace enterprice{
 
 struct MultiCandleStream
 {
@@ -40,35 +40,7 @@ struct MultiCandleStream
   }
 };
 
-} // enterprice
-
-#ifdef ENTERPRICE_IO_MULTICANDLESTREAM_HPP_TEST
-
-#include <vector>
-#include <tuple>
-#include <cassert>
-#include <iostream>
-
-int main()
-{
-  typedef std::vector<std::tuple<std::string, unsigned long, double, double, double, double, double>> data_t;
-  data_t data;
-  
-  enterprice::MultiCandleStream streams(5, [&](std::string const &code, unsigned long ts, double o, double h, double l, double c, double v){
-    data.push_back(std::make_tuple(code, ts, o, h, l, c, v));
-  });
-
-  streams.data("OMG", 1000, 10, 1);
-  streams.data("LOL", 1001, 12, 1);
-  streams.data("LOL", 1005, 10, 1);
-  streams.data("LOL", 1006, 9, 1);
-  streams.data("OMG", 1006, 10, 1);
-  
-  assert( data[0]== data_t::value_type("LOL", 1001, 12, 12, 10, 10, 2) );
-  assert( data[1]== data_t::value_type("OMG", 1000, 10, 10, 10, 10, 1) );
-}
-
-#endif
+} } // pwned::enterprice
 
 #endif
 

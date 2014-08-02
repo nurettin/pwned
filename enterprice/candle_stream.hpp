@@ -5,7 +5,7 @@
 #include <limits>
 #include <iostream>
 
-namespace enterprice{
+namespace pwned { namespace enterprice {
 
   struct CandleStream
   {
@@ -69,7 +69,7 @@ namespace enterprice{
       block(pivot, prev_close, prev_close, prev_close, prev_close, 0);
     }
   };
-} // enterprice
+} } // pwned::enterprice
 
 #ifdef ENTERPRICE_IO_CANDLESTREAM_HPP_TEST
 

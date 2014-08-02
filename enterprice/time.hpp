@@ -5,7 +5,7 @@
 #include <ctime>
 #include <stdexcept>
 
-namespace time_util {
+namespace pwned{ namespace time_util {
 
 std::time_t ymd_to_time_t(std::string const &str)
 {
@@ -26,7 +26,7 @@ std::string time_t_to_ymd(std::time_t t)
   return buf;
 }
 
-} // time_util
+} } // pwned::time_util
 
 #ifdef TIME_HPP_TEST
 

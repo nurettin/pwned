@@ -14,6 +14,10 @@ Special thanks to [httpbin](https://github.com/kennethreitz/httpbin) for providi
 1. Every function has tests, google tests! For documentation, read the fabulous tests.
 2. Opensource. Clone, feature branch, add code, add test, pull request, I will merge all things awesome 100% guaranteed.
 
+## pwned::enterprice
+
+Enter Price> is a C++ finance library for inspecting time series.
+
 ## pwned::server
 
 Create REST services with ease. A-la sinatra in C++

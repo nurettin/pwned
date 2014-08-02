@@ -19,7 +19,8 @@ run_tests:
 	cd server && $(MAKE) && cd .. && \
 	cd pew && $(MAKE) && cd .. && \
 	cd active_proto && $(MAKE) && cd .. && \
-	cd ecto1 && $(MAKE) && cd ..
+	cd ecto1 && $(MAKE) && cd .. && \
+	cd enterprice && $(MAKE) test && cd ..
 	@printf "test LOC:" && wc -l */tests.cpp | grep total
 	@printf "code LOC:" && wc -l */*.hpp | grep total
 

@@ -28,16 +28,5 @@ std::string time_t_to_ymd(std::time_t t)
 
 } } // pwned::time_util
 
-#ifdef TIME_HPP_TEST
-
-#include <cassert>
-
-int main()
-{
-  assert( time_util::time_t_to_ymd(time_util::ymd_to_time_t("2014-07-20"))== "2014-07-20" );
-}
-
-#endif
-
 #endif
 

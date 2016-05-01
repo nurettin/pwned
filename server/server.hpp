@@ -361,8 +361,8 @@ struct Server
       bool ok= false;
       while(1)
       {
-        ok= std::getline(parser, key, '='); if(!ok) break;
-        ok= std::getline(parser, value, '&');
+        ok= bool(std::getline(parser, key, '=')); if(!ok) break;
+        ok= bool(std::getline(parser, value, '&'));
         pair_block_param-> second.insert(std::make_pair(key, value));
         if(!ok) break;
       }

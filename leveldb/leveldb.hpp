@@ -103,7 +103,7 @@ struct DB
   }
 
   //! Call block on leveldb range of keys
-  void each(::leveldb::Slice const &begin
+  void each2(::leveldb::Slice const &begin
     , ::leveldb::Slice const &end
     , std::function<void(std::string const &, std::string const &)> f)
   {

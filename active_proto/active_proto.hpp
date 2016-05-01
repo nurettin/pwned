@@ -111,6 +111,8 @@ struct Active
     auto const &f0= dirty_fields.at(0);
     if(f0-> type()== google::protobuf::FieldDescriptor::TYPE_INT32)
       cat<< f0-> name()<< "= "<< ref-> GetInt32(newer, f0);
+    else if(f0-> type()== google::protobuf::FieldDescriptor::TYPE_INT64)
+      cat<< f0-> name()<< "= "<< ref-> GetInt64(newer, f0);
     else if(f0-> type()== google::protobuf::FieldDescriptor::TYPE_STRING)
       cat<< f0-> name()<< "= '"<< ref-> GetString(newer, f0)<< "'";
     else if(f0-> type()== google::protobuf::FieldDescriptor::TYPE_DOUBLE)
@@ -119,6 +121,8 @@ struct Active
     for(auto &f: dirty_fields)
       if(f-> type()== google::protobuf::FieldDescriptor::TYPE_INT32)
         cat<< ", "<< f-> name()<< "= "<< ref-> GetInt32(newer, f);
+      else if(f-> type()== google::protobuf::FieldDescriptor::TYPE_INT64)
+        cat<< ", "<< f-> name()<< "= "<< ref-> GetInt64(newer, f);
       else if(f-> type()== google::protobuf::FieldDescriptor::TYPE_STRING)
         cat<< ", "<< f-> name()<< "= '"<< ref-> GetString(newer, f)<< "'";
       else if(f-> type()== google::protobuf::FieldDescriptor::TYPE_DOUBLE)
@@ -132,6 +136,7 @@ struct Active
     switch(type)
     {
       case google::protobuf::FieldDescriptor::TYPE_INT32:
+      case google::protobuf::FieldDescriptor::TYPE_INT64:
         return "INTEGER";
       case google::protobuf::FieldDescriptor::TYPE_STRING:
         return "TEXT";
@@ -169,6 +174,8 @@ struct Active
 
         if(fp-> type()== google::protobuf::FieldDescriptor::TYPE_INT32)
           sqlite3_bind_int(stmt, f, ref-> GetInt32(newer, fp));
+        else if(fp-> type()== google::protobuf::FieldDescriptor::TYPE_INT64)
+          sqlite3_bind_int(stmt, f, ref-> GetInt64(newer, fp));
         else if(fp-> type()== google::protobuf::FieldDescriptor::TYPE_STRING)
         {
           std::string str= ref-> GetString(newer, fp);
@@ -178,8 +185,12 @@ struct Active
           sqlite3_bind_double(stmt, f, ref-> GetDouble(newer, fp));
       }
         
-      sqlite3_step(stmt);
-      newer.set_id(sqlite3_last_insert_rowid(db));
+      if(sqlite3_step(stmt) != SQLITE_DONE){
+        std::cerr<< sqlite3_errmsg(db)<< '\n';
+      } else {
+        newer.set_id(sqlite3_last_insert_rowid(db));
+      }
+      sqlite3_finalize(stmt);
     }
     else
     {
@@ -203,6 +214,7 @@ struct Active
       sqlite3_prepare_v2(db, sql.c_str(), sql.size(), &stmt, 0);
       sqlite3_bind_int(stmt, 1, ref-> GetInt32(newer, desc-> field(0)));
       sqlite3_step(stmt); 
+      sqlite3_finalize(stmt);
     }
     older= newer;
   }
@@ -284,7 +296,9 @@ struct Active
     sqlite3_stmt* stmt;
     sqlite3_prepare_v2(db, sql.c_str(), sql.size(), &stmt, 0);
     sqlite3_step(stmt);
-    return sqlite3_column_int(stmt, 0);
+    int counter = sqlite3_column_int(stmt, 0);
+    sqlite3_finalize(stmt);
+    return counter;
   }
 
   void destroy()
@@ -294,6 +308,7 @@ struct Active
     sqlite3_prepare_v2(db, sql.c_str(), sql.size(), &stmt, 0);
     sqlite3_bind_int(stmt, 1, ref-> GetInt32(newer, desc-> field(0)));
     sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
   }
   
   void delete_all()

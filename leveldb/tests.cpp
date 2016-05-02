@@ -65,11 +65,11 @@ TEST(PwnedLeveldb, Each)
   LeveldbEnv::db-> put("20130913114805", "def");
   LeveldbEnv::db-> put("20130913114900", "wtf");
   std::vector<std::string> data;
-  LeveldbEnv::db-> each("20130913114800", "20130913114859", [&](std::string const &, std::string const &v) {
+  LeveldbEnv::db-> each2("20130913114800", "20130913114859", [&](std::string const &, std::string const &v) {
     data.push_back(v);
   });
   EXPECT_EQ(data, (std::vector<std::string> { "abc", "def" }));
-  LeveldbEnv::db-> each("20130913114859", "20130913114900", [&](std::string const &, std::string const &v) {
+  LeveldbEnv::db-> each2("20130913114859", "20130913114900", [&](std::string const &, std::string const &v) {
     data.push_back(v);
   });
   EXPECT_EQ(data, (std::vector<std::string> { "abc", "def", "wtf" }));
@@ -86,7 +86,7 @@ TEST(PwnedLeveldb, Batch)
     batch.Put("20130913114900", "wtf");
   });
   int count= 0;
-  LeveldbEnv::db-> each("20130913114800", "20130913115000", [&](std::string const &, std::string const &) {
+  LeveldbEnv::db-> each2("20130913114800", "20130913115000", [&](std::string const &, std::string const &) {
     ++ count;
   });
   EXPECT_EQ(count, 3);
